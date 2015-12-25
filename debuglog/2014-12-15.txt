@@ -1,0 +1,277 @@
+------------------------------------------
+//question
+-O3 段对其
+编译后地址顺序start-->cmd4-->cmd3-->cmd2-->cmd1--end
+******************************************
+//code
+全局
+W_BOOT_CMDn(cmd1,do_null,"shell help");
+W_BOOT_CMDn(cmd2,do_null,"shell help");
+W_BOOT_CMDn(cmd3,do_null,"shell help");
+W_BOOT_CMDn(cmd4,do_null,"shell help");
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//output
+root@fnc:yaffs1# readelf -s release/download.elf | grep __w
+   352: 3000d600     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_start
+   375: 3000d600    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd4
+   426: 3000d60c    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd3
+   472: 3000d630     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_end
+   482: 3000d618    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd2
+   537: 3000d624    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd1
+
+
+------------------------------------------
+//question
+-O3 段不对其
+编译后地址顺序start（并且start不等于cmd4）-->cmd4-->cmd3-->cmd2-->cmd1--end
+******************************************
+//code
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+   352: 3000d5fe     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_start
+   375: 3000d600    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd4
+   426: 3000d60c    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd3
+   472: 3000d630     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_end
+   482: 3000d618    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd2
+   537: 3000d624    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd1
+------------------------------------------
+//question
+
+******************************************
+//code
+-O1 地址不对其
+编译后地址顺序start-->cmd1-->cmd2-->cmd3-->cmd4--end
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//output
+root@fnc:yaffs1# readelf -s release/download.elf | grep __w
+   405: 3000997c     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_start
+   428: 300099a0    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd4
+   479: 30009994    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd3
+   525: 300099ac     0 NOTYPE  GLOBAL DEFAULT  ABS __w_boot_cmd_end
+   535: 30009988    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd2
+   590: 3000997c    12 OBJECT  GLOBAL DEFAULT    8 __w_boot_cmd_cmd1
+
+------------------------------------------
+//question
+uboot原始只包含-Os优化
+******************************************
+//code
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//output
+root@fnc:yaffs1# readelf -s /opt/EmbedSky/u-boot-1.1.6/u-boot | grep __u
+  1498: 33d38230    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_dcache
+  1511: 33d38530    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ping
+  1516: 33d38350    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsinfo
+  1554: 33d013e0   152 FUNC    GLOBAL DEFAULT    1 __udivsi3
+  1556: 33d384b8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mm
+  1587: 33d380f8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_noos
+  1588: 33d38158    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_eboot
+  1593: 33d38398    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loady
+  1594: 33d38140    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_wince
+  1609: 33d38668    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_version
+  1629: 33d38248    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_icache
+  1657: 33d38110    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_test_zImage
+  1658: 33d25308  1348 FUNC    GLOBAL HIDDEN     1 __udivdi3
+  1674: 33d382f0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_flinfo
+  1682: 33d38260    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_coninfo
+  1694: 33d385c0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_setenv
+  1700: 33d38278    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_date
+  1702: 33d38470    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cp
+  1726: 33d381a0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_reset
+  1731: 33d38338    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_chpart
+  1736: 33d385f0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_usbslave
+  1741: 33d38320    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtdparts
+  1743: 33d38410    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loop
+  1753: 33d38518    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nand
+  1763: 33d38218    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootm
+  1768: 33d383b0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadx
+  1787: 33d38428    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_base
+  1800: 33d385d8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_printenv
+  1807: 33d38548    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_rarpboot
+  1828: 33d384e8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_sleep
+  1857: 33d38650    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_echo
+  1863: 33d38638    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_help
+  1871: 33d383e0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loads
+  1872: 33d38308    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_itest
+  1873: 33d38680    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadYaffs
+  1875: 33d38698     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_end
+  1900: 33d385a8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_saveenv
+  1901: 33d38590    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_run
+  1903: 33d38608    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_menu
+  1918: 33d382c0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_protect
+  1919: 33d38620    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_question_mar
+  1920: 33d382a8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootelf
+  1923: 33d38488    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mw
+  1950: 33d38128    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_zImage
+  1958: 33d38578    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootp
+  1965: 33d38170    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_autoscr
+  1969: 33d38458    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cmp
+  1976: 33d381d0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_iminfo
+  2015: 33d383c8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadb
+  2019: 33d384a0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nm
+  2022: 33d383f8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtest
+  2031: 33d38440    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_crc32
+  2056: 33d384d0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_md
+  2068: 33d38560    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_tftpboot
+  2077: 33d1f300   180 FUNC    GLOBAL DEFAULT    1 __umodsi3
+  2085: 33d38188    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bdinfo
+  2094: 33d381e8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootd
+  2101: 33d38290    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootvx
+  2107: 33d38368    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ls
+  2124: 33d382d8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_erase
+  2127: 33d38500    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nboot
+  2136: 33d380f8     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_start
+  2142: 33d38200    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot
+  2146: 33d38380    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsload
+  2149: 33d381b8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_go
+
+------------------------------------------
+//question
+uboot 加入-O3 优化后
+******************************************
+//code
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//output
+
+root@fnc:yaffs1# readelf -s /opt/EmbedSky/u-boot-1.1.6/u-boot | grep __u
+  1424: 33d3fd18    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_dcache
+  1437: 33d40018    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ping
+  1442: 33d3fe38    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsinfo
+  1480: 33d01b20   152 FUNC    GLOBAL DEFAULT    1 __udivsi3
+  1482: 33d3ffa0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mm
+  1513: 33d3fbe0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_noos
+  1514: 33d3fc40    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_eboot
+  1519: 33d3fe80    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loady
+  1520: 33d3fc28    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_wince
+  1535: 33d40150    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_version
+  1555: 33d3fd30    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_icache
+  1583: 33d3fbf8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_test_zImage
+  1584: 33d2ce14  1348 FUNC    GLOBAL HIDDEN     1 __udivdi3
+  1600: 33d3fdd8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_flinfo
+  1608: 33d3fd48    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_coninfo
+  1620: 33d400a8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_setenv
+  1626: 33d3fd60    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_date
+  1628: 33d3ff58    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cp
+  1652: 33d3fc88    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_reset
+  1657: 33d3fe20    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_chpart
+  1662: 33d400d8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_usbslave
+  1667: 33d3fe08    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtdparts
+  1669: 33d3fef8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loop
+  1679: 33d40000    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nand
+  1689: 33d3fd00    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootm
+  1694: 33d3fe98    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadx
+  1713: 33d3ff10    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_base
+  1726: 33d400c0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_printenv
+  1733: 33d40030    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_rarpboot
+  1754: 33d3ffd0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_sleep
+  1783: 33d40138    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_echo
+  1789: 33d40120    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_help
+  1797: 33d3fec8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loads
+  1798: 33d3fdf0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_itest
+  1799: 33d40168    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadYaffs
+  1801: 33d40180     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_end
+  1826: 33d40090    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_saveenv
+  1827: 33d40078    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_run
+  1829: 33d400f0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_menu
+  1844: 33d3fda8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_protect
+  1845: 33d40108    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_question_mar
+  1846: 33d3fd90    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootelf
+  1849: 33d3ff70    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mw
+  1876: 33d3fc10    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_zImage
+  1884: 33d40060    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootp
+  1891: 33d3fc58    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_autoscr
+  1895: 33d3ff40    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cmp
+  1902: 33d3fcb8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_iminfo
+  1941: 33d3feb0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadb
+  1945: 33d3ff88    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nm
+  1948: 33d3fee0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtest
+  1957: 33d3ff28    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_crc32
+  1982: 33d3ffb8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_md
+  1994: 33d40048    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_tftpboot
+  2003: 33d25248   180 FUNC    GLOBAL DEFAULT    1 __umodsi3
+  2011: 33d3fc70    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bdinfo
+  2020: 33d3fcd0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootd
+  2027: 33d3fd78    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootvx
+  2033: 33d3fe50    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ls
+  2050: 33d3fdc0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_erase
+  2053: 33d3ffe8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nboot
+  2062: 33d3fbe0     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_start
+  2068: 33d3fce8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot
+  2072: 33d3fe68    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsload
+  2075: 33d3fca0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_go
+
+------------------------------------------
+//question
+
+******************************************
+//code
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//output
+root@fnc:yaffs1# readelf -s /opt/EmbedSky/u-boot-1.1.6/u-boot | grep __u
+  1424: 33d3fd18    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_dcache
+  1437: 33d40018    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ping
+  1442: 33d3fe38    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsinfo
+  1480: 33d01b20   152 FUNC    GLOBAL DEFAULT    1 __udivsi3
+  1482: 33d3ffa0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mm
+  1513: 33d3fbe0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_noos
+  1514: 33d3fc40    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_eboot
+  1519: 33d3fe80    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loady
+  1520: 33d3fc28    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_wince
+  1535: 33d40150    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_version
+  1555: 33d3fd30    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_icache
+  1583: 33d3fbf8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_test_zImage
+  1584: 33d2ce14  1348 FUNC    GLOBAL HIDDEN     1 __udivdi3
+  1600: 33d3fdd8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_flinfo
+  1608: 33d3fd48    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_coninfo
+  1620: 33d400a8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_setenv
+  1626: 33d3fd60    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_date
+  1628: 33d3ff58    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cp
+  1652: 33d3fc88    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_reset
+  1657: 33d3fe20    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_chpart
+  1662: 33d400d8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_usbslave
+  1667: 33d3fe08    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtdparts
+  1669: 33d3fef8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loop
+  1679: 33d40000    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nand
+  1689: 33d3fd00    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootm
+  1694: 33d3fe98    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadx
+  1713: 33d3ff10    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_base
+  1726: 33d400c0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_printenv
+  1733: 33d40030    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_rarpboot
+  1754: 33d3ffd0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_sleep
+  1783: 33d40138    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_echo
+  1789: 33d40120    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_help
+  1797: 33d3fec8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loads
+  1798: 33d3fdf0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_itest
+  1799: 33d40168    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadYaffs
+  1801: 33d40180     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_end
+  1826: 33d40090    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_saveenv
+  1827: 33d40078    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_run
+  1829: 33d400f0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_menu
+  1844: 33d3fda8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_protect
+  1845: 33d40108    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_question_mar
+  1846: 33d3fd90    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootelf
+  1849: 33d3ff70    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mw
+  1876: 33d3fc10    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot_zImage
+  1884: 33d40060    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootp
+  1891: 33d3fc58    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_autoscr
+  1895: 33d3ff40    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_cmp
+  1902: 33d3fcb8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_iminfo
+  1941: 33d3feb0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_loadb
+  1945: 33d3ff88    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nm
+  1948: 33d3fee0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_mtest
+  1957: 33d3ff28    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_crc32
+  1982: 33d3ffb8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_md
+  1994: 33d40048    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_tftpboot
+  2003: 33d25248   180 FUNC    GLOBAL DEFAULT    1 __umodsi3
+  2011: 33d3fc70    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bdinfo
+  2020: 33d3fcd0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootd
+  2027: 33d3fd78    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_bootvx
+  2033: 33d3fe50    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_ls
+  2050: 33d3fdc0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_erase
+  2053: 33d3ffe8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_nboot
+  2062: 33d3fbe0     0 NOTYPE  GLOBAL DEFAULT  ABS __u_boot_cmd_start
+  2068: 33d3fce8    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_boot
+  2072: 33d3fe68    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_fsload
+  2075: 33d3fca0    24 OBJECT  GLOBAL DEFAULT    9 __u_boot_cmd_go

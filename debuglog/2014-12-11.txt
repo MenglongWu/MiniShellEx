@@ -1,0 +1,336 @@
+探究为什么Yaffs将Space的第5字节写成0（删除该page）
+yaffs_MknodDirectory
+	yaffs_MknodDirectory
+		yaffs_MknodObject
+
+			yaffs_FindObjectByName
+			yaffs_CreateNewObject
+			yfsd_WinFileTimeNow   for wince
+			yaffs_SetObjectName
+			yaffs_AddObjectToDirectory
+			yaffs_UpdateObjectHeader
+			yaffs_AbortHalfCreatedObject
+
+
+MiniShell>mkdir /boot/dkf
+mkdir /boot/dkf
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+
+
+
+------------------------------------------
+MiniShell>mkdir /boot/d
+mkdir /boot/d
+dfdfdf
+        Call yaffs_FindObjectByName
+        Call yaffs_CreateNewObject()
+        Aft Call yaffs_CreateNewObject()
+        Call yaffs_UpdateObjectHeader()
+         if(!in->fake || force)
+        Call yaffs_CheckGarbageCollection()
+Call yaffs_WriteNewChunkWithTagsToNAND()
+Ret yaffs_SpareInitialise()
+Ret yaffs_WriteNewChunkToNAND()
+Call yaffs_AllocateChunk()
+Call yaffs_CheckChunkErased()
+**>> yaffs chunk 2610 was not erased
+Call yaffs_HandleWriteChunkError()
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+chunk 2610 writeOk? 0
+Call yaffs_AllocateChunk()
+Call yaffs_CheckChunkErased()
+**>> yaffs chunk 2611 was not erased
+Call yaffs_HandleWriteChunkError()
+
+
+00000000:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000010:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000020:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000030:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000040:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000050:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000060:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000070:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000080:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000090:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000000f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000100:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000110:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000120:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000130:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000140:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000150:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000160:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000170:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000180:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+00000190:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001a0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001b0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001c0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001d0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001e0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+000001f0:  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff 
+
+
+00000000:  ff ff ff ff 00 ff ff ff  ff ff ff ff ff ff ff ff 
+chunk 2611 writeOk? 0
+Call yaffs_AllocateChunk()
+Call yaffs_CheckChunkErased()
+**>> yaffs chunk 2612 was not erased
+Call yaffs_HandleWriteChunkError()
+
