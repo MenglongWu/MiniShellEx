@@ -13,6 +13,10 @@
 #define CONFIG_2440_IRQ                                         1
 #define CONFIG_2440_TOUCH                                       1
 #define CONFIG_TOUCH_TEST                                       1
+#define CONFIG_USE_TQ                                           1
 #define CONFIG_2440_IIC                                         1
+#define CONFIG_2440_CAMIF                                       1
+#define CONFIG_OV9650                                           1
+#define CONFIG_USE_MINISHELL                                    1
 
 #endif
