@@ -24,5 +24,10 @@
 // extern int do_file2nand(int argc,char **argv);
 // extern int do_mount(int argc,char **argv);
 
+#define INIT_CMD \
+	{(char*)"cmd1",do_null,(char*)"do nothing"}, \
+	{(char*)"cmd1",do_null,(char*)"do nothing"}, \
+	{(char*)"cmd2",do_null,(char*)"do nothing"}
+	
 #endif
 
