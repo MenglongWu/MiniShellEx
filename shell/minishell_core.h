@@ -70,7 +70,13 @@ struct env {
 	char path[SHELL_PATH_LEN];
 };
 
-
+struct sh_detach_depth
+{
+	char **cmd;
+	int len;
+	int count;
+	char *seps;
+};
 
 
 

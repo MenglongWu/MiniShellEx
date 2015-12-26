@@ -10,12 +10,18 @@
 // #  include "history.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+const char _seps[] = " ,\t\n";
+
 
 int do_undo_ex(void *ptr, int argc, char **argv)
 {
 	return 0;
 }
 
+// void sh_init_env()
+// {
+
+// }
 void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
 {
 	// char *cmd[256],
@@ -33,6 +39,28 @@ void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
 		token = strtok(NULL,seps);	
 	}
 	*count = index;
+}
+
+void sh_detach_fmt2 (char *fmt,long len, struct sh_detach_depth *depth)
+{
+	// char *cmd[256],
+	char *token = NULL;	
+	int   index = 0;
+	char  seps[] = " ,\t\n";
+
+	//step 1:提取第一个单词，并在命令列表里寻找是否存在命令
+	*(fmt+len) = '\0';
+	token = strtok(fmt,seps);
+
+
+	// printf("fun addr %x %x\n", depth->cmd[0],  depth->cmd[1] );
+	while(token != NULL) {
+		// depth->cmd[index] = token;
+		depth->cmd[index] = token;
+		index++;
+		token = strtok(NULL,seps);	
+	}
+	depth->count = index;
 }
 void sh_display_prompt(struct cmd_prompt *pprompt);
 
@@ -137,7 +165,7 @@ int funtest(int a, int b)
 	_prompt_index    = 0;
 	
 	printf ("a = %d b = %d\n", a, b);
-	printf("[%s]", rl_display_prompt);
+	// printf("[%s]", rl_display_prompt);
 	rl_bind_key('?',funtest2);
 	return 0;
 }	
@@ -208,7 +236,7 @@ int funtest2(int a, int b)
 	return 0;
 }	
 
-void sh_analyse_ex (char *fmt, long len)
+void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 {
 	//char (*cmd)[10];
 	char *cmd[256], *token = NULL;
@@ -220,11 +248,24 @@ void sh_analyse_ex (char *fmt, long len)
 	struct cmd_prompt *pstart;
 	int find = 0;
 
-	sh_detach_fmt(fmt,len,cmd,&count);
-	if (count) {
+	// sh_detach_fmt(fmt,len,cmd,&count);
+	// char str1[] = "abcd";
+	// char str2[] = "defg";
+
+	// cmd[0] = str1;
+	// cmd[1] = str2;
+	struct sh_detach_depth depth;
+	depth.cmd = cmd;
+	depth.len = 4;
+	depth.count = 0;
+	depth.seps = NULL;
+	// printf("[%x]", depth2->cmd +1);
+	// sh_detach_fmt2(fmt,len, &depth2);
+	sh_detach_fmt2(fmt,len, depth2);
+	if (depth2->count) {
 		pstart = _prompt_tree[_prompt_index];
 		while(pstart->name) {
-			if(0 == memcmp(cmd[0], pstart->name, strlen(cmd[0]))) {
+			if(0 == memcmp(depth2->cmd[0], pstart->name, strlen(depth2->cmd[0]))) {
 				find = 1;
 				break;
 			}
@@ -233,11 +274,12 @@ void sh_analyse_ex (char *fmt, long len)
 
 		if(find == 1) {
 			if (pstart->fun) {
-				pstart->fun(NULL, count, (char **)cmd);
+				pstart->fun(NULL, depth2->count, (char **)cmd);
 			}
 		}
 		else {
-			printf("%s: command not found\n", token);
+			// printf("%s: command not found\n", token);
+			printf("%s: command not found\n", depth2->cmd[0]);
 		}
 	}
 	return ;
@@ -273,16 +315,31 @@ void sh_analyse_ex (char *fmt, long len)
 	}
 }
 
-int sh_enter_ex()
+int sh_enter_ex(struct sh_detach_depth *env)
 {
 	char shell_prompt[256];
 	char *input = (char *)NULL;
+	struct sh_detach_depth *penv;
 	sh_sort();
 	// sh_init();
 	memcpy(g_envLocal.host, "MiniShell\0", 10);
 	g_envLocal.path[0] = '\0';
 
-	
+	char *cmd[12];
+	struct sh_detach_depth local;
+	local.cmd = cmd;
+	local.len = 4;
+	local.count = 0;
+	local.seps = _seps;
+	local.cmd[1] = "abcd";
+	if (env) {
+		penv = env;
+	}
+	else {
+		penv = &local;
+	}
+	penv = &local;
+
 	while(1) {
 
 		if(input) {
@@ -297,7 +354,7 @@ int sh_enter_ex()
 		}
 		if (*input != '\0') {
 			add_history(input);
-			sh_analyse_ex(input, strlen(input));
+			sh_analyse_ex(input, strlen(input), penv);
 			if(0 == strcmp(input, "quit")) {
 				printf("\r\n");
 				break;

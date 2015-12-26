@@ -33,6 +33,7 @@ struct cmd_prompt cmd_boot[] = {
   PROMPT_NODE(cmd_2, do_c1_ex,"c11", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(cmd_2, do_c2_ex,"c1224", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(cmd_2, NULL,"c1331", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(NULL, NULL,"quit", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
 
@@ -66,11 +67,12 @@ int do_c2_ex(int argc, char **argv)
   sh_up_prompt_level();
 }
 
+// const char str[] = "asbcdfasf";
 void main()
 {
   funtest();
   initialize_readline();
-  sh_enter_ex();
+  sh_enter_ex(NULL);
 }
 
 
