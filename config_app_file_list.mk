@@ -78,3 +78,6 @@ endif
 
 
 
+SRCS-y = src/main.c
+SRCS-y += shell/minishell_core.c
+SRCS-y += shell/minishell_core_ex.c

@@ -23,8 +23,8 @@ extern "C" {
 
 
 #if !defined(CMD_ARRAY) && !defined(CMD_SECTION) && !defined(CMD_LDS)
-	#define CMD_LDS
-	// #define CMD_ARRAY
+	// #define CMD_LDS
+	#define CMD_ARRAY
 	// #define CMD_SECTION
 #endif
 
@@ -89,8 +89,11 @@ extern void sh_sort_ex(struct cmd_prompt *cmdlist, int count);
 
 
 
-
-
+// #define PROMPT_NODE(a,b,c,d) {(char*)(a), (char*)(b), (struct cmd_prompt	*)(c), (int)(d)}
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+#define PROMPT_NODE(a,b,c,d) {(struct cmd_prompt	*)(a),(char*)(b), (char*)(c),  (int)(d)}
 
 
 // W_BOOT_CMD do what

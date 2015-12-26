@@ -30,7 +30,7 @@ endif
 #################################################################
 # CROSS_COMPILE		- While the cross tool link
 # ARCH				- Target platform
-ARCH=arm920t
+ARCH=x86
 DEV=MCU
 ifeq ("$(ARCH)", "")
 	ARCH=x86
