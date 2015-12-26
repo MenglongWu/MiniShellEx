@@ -20,7 +20,13 @@ extern "C" {
 #endif
 
 
+#ifdef CONFIG_MINISHELL_READLINE
+	#define echo_printf printf
 
+#else
+	#define echo_printf printk
+#endif
+	
 
 #if !defined(CMD_ARRAY) && !defined(CMD_SECTION) && !defined(CMD_LDS)
 	// #define CMD_LDS

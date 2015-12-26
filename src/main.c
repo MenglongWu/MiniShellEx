@@ -12,12 +12,14 @@ struct cmd_prompt cmd_1[] = {
   // {(struct cmd_prompt  *)(NULL),(char*)("ddd"), (char*)(), (int)(d)},
   PROMPT_NODE(NULL, do_c1_ex,"11", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, do_c2_ex,"12", "abc", NULL),
+  PROMPT_NODE(NULL, do_c2_ex,"c2", "abc", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
 
 struct cmd_prompt cmd_2[] = {
   PROMPT_NODE(NULL, do_c1_ex,"++", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, do_c2_ex,"--", "abc", NULL),
+  PROMPT_NODE(NULL, do_c2_ex,"c2", "abc", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
 
@@ -68,7 +70,7 @@ void main()
 {
   funtest();
   initialize_readline();
-  sh_enter();
+  sh_enter_ex();
 }
 
 

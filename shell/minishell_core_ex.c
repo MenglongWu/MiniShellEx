@@ -15,7 +15,8 @@ int do_undo_ex(void *ptr, int argc, char **argv)
 {
 	return 0;
 }
-void sh_analyse_ex (char *fmt,long len, char **cmd, int *count)
+
+void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
 {
 	// char *cmd[256],
 	char *token = NULL;	
@@ -176,7 +177,7 @@ int funtest2(int a, int b)
 	int count;
 	memcpy(pbuf, rl_line_buffer, len);
 
-	sh_analyse_ex(pbuf, len, cmd, &count);
+	sh_detach_fmt(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
 	putchar('\n');
@@ -206,3 +207,103 @@ int funtest2(int a, int b)
 
 	return 0;
 }	
+
+void sh_analyse_ex (char *fmt, long len)
+{
+	//char (*cmd)[10];
+	char *cmd[256], *token = NULL;
+	unsigned int count = 0;
+	char seps[]   = " ,\t\n";
+
+	// struct cmd_table *pstart;
+	// struct cmd_table *pend;
+	struct cmd_prompt *pstart;
+	int find = 0;
+
+	sh_detach_fmt(fmt,len,cmd,&count);
+	if (count) {
+		pstart = _prompt_tree[_prompt_index];
+		while(pstart->name) {
+			if(0 == memcmp(cmd[0], pstart->name, strlen(cmd[0]))) {
+				find = 1;
+				break;
+			}
+			pstart++;
+		}
+
+		if(find == 1) {
+			if (pstart->fun) {
+				pstart->fun(NULL, count, (char **)cmd);
+			}
+		}
+		else {
+			printf("%s: command not found\n", token);
+		}
+	}
+	return ;
+	//step 1:提取第一个单词，并在命令列表里寻找是否存在命令
+	*(fmt + len) = '\0';
+	token = strtok(fmt, seps);
+
+	if(token != NULL) {
+		cmd[count] = token;
+		pstart = _prompt_tree[_prompt_index];
+		while(pstart->name) {
+			if(0 == memcmp(cmd[0], pstart->name, strlen(cmd[0]))) {
+				find = 1;
+				break;
+			}
+			pstart++;
+		}
+
+		//step 2:提取参数
+		if(find == 1) {
+			while(token != NULL) {
+				cmd[count] = token;
+				count++;
+				token = strtok(NULL, seps);
+			}
+			if (pstart->fun) {
+				pstart->fun(NULL, count, (char **)cmd);
+			}
+		}
+		else {
+			printf("%s: command not found\n", token);
+		}
+	}
+}
+
+int sh_enter_ex()
+{
+	char shell_prompt[256];
+	char *input = (char *)NULL;
+	sh_sort();
+	// sh_init();
+	memcpy(g_envLocal.host, "MiniShell\0", 10);
+	g_envLocal.path[0] = '\0';
+
+	
+	while(1) {
+
+		if(input) {
+			free(input);
+			input = NULL;
+		}
+
+		snprintf(shell_prompt, sizeof(shell_prompt), "%s:%s>", g_envLocal.host, g_envLocal.path);
+		input = readline(shell_prompt);
+		if(!input) {
+			return -1;
+		}
+		if (*input != '\0') {
+			add_history(input);
+			sh_analyse_ex(input, strlen(input));
+			if(0 == strcmp(input, "quit")) {
+				printf("\r\n");
+				break;
+			}
+		}
+	}
+
+	return 0;
+}

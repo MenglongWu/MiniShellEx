@@ -43,12 +43,7 @@ extern "C" {
 #include "minishell_core.h"
 
 
-#ifdef CONFIG_MINISHELL_READLINE
-	#define echo_printf printf
 
-#else
-	#define echo_printf printk
-#endif
 
 
 #ifdef CONFIG_MINISHELL_READLINE
