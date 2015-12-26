@@ -11,6 +11,10 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+int do_undo_ex(void *ptr, int argc, char **argv)
+{
+	return 0;
+}
 void sh_analyse_ex (char *fmt,long len, char **cmd, int *count)
 {
 	// char *cmd[256],
@@ -137,15 +141,24 @@ int funtest(int a, int b)
 	return 0;
 }	
 
-struct cmd_prompt *sh_downlevel(
+struct cmd_prompt *sh_down_prompt_level(
 	struct cmd_prompt *level)
 {
-	if (_prompt_index < (PROMPT_DEPTH - 2) ) {
+	if (_prompt_index >= (PROMPT_DEPTH - 2) ) {
 		return NULL;
 	}
-	
 	_prompt_tree[ ++_prompt_index ] = level;
 	return _prompt_tree[_prompt_index-1];
+}
+
+
+struct cmd_prompt *sh_up_prompt_level(void)
+{
+	if (_prompt_index == 0 ) {
+		return NULL;
+	}
+	_prompt_index--;
+	return _prompt_tree[_prompt_index+1];
 }
 
 
@@ -168,7 +181,8 @@ int funtest2(int a, int b)
 	struct cmd_prompt *plist;
 	putchar('\n');
 	int ret;
-	ret = searchboot(count, cmd, _prompt_tree[0], &plist);
+	printf("index %d\n", _prompt_index);
+	ret = searchboot(count, cmd, _prompt_tree[_prompt_index], &plist);
 	// printf("ret = %d\n", ret);
 	if (ret == 0 || ret == 1) {
 		// sh_display_prompt(plist);

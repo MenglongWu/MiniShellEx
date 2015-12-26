@@ -23,10 +23,13 @@
 // extern int do_copy_sdram2nand(int argc,char **argv);
 // extern int do_file2nand(int argc,char **argv);
 // extern int do_mount(int argc,char **argv);
-
+int do_c1(int argc,char **argv);
+int do_c2(int argc,char **argv);
 #define INIT_CMD \
 	{(char*)"cmd1",do_null,(char*)"do nothing"}, \
 	{(char*)"cmd1",do_null,(char*)"do nothing"}, \
+	{(char*)"c1",do_c1,(char*)"do nothing"}, \
+	{(char*)"c2",do_c2,(char*)"do nothing"}, \
 	{(char*)"cmd2",do_null,(char*)"do nothing"}
 	
 #endif

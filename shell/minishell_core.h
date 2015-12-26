@@ -42,6 +42,7 @@ extern "C" {
 
 struct cmd_prompt {
 	struct cmd_prompt	*next;
+	int (*fun)(void *ptr, int argc, char **argv);
 	char *name;
 	char *help;
 	int type;
@@ -82,18 +83,30 @@ extern void sh_editpath(char *path);
 extern void sh_sort();
 extern void sh_sort_ex(struct cmd_prompt *cmdlist, int count);
 
+extern int do_undo_ex(void *ptr, int argc, char **argv);
+
+extern struct cmd_prompt *sh_down_prompt_level(
+	struct cmd_prompt *level);
+extern struct cmd_prompt *sh_up_prompt_level(void);
 #ifdef CMD_SECTION
 	extern volatile int __wcmd_start;
 	extern volatile int __wcmd_end;
 #endif
 
 
-
+#define SH_FUN_NULL do_undo_ex
 // #define PROMPT_NODE(a,b,c,d) {(char*)(a), (char*)(b), (struct cmd_prompt	*)(c), (int)(d)}
 #ifndef NULL
 #define NULL ((void*)0)
 #endif
-#define PROMPT_NODE(a,b,c,d) {(struct cmd_prompt	*)(a),(char*)(b), (char*)(c),  (int)(d)}
+#define PROMPT_NODE(a,f,b,c,d) \
+{ \
+	.next = (struct cmd_prompt	*)(a), \
+	.fun  = (int (*)(int argc, char **argv))f, \
+	.name = (char*)(b), \
+	.help = (char*)(c), \
+	.type = (int)(d), \
+}
 
 
 // W_BOOT_CMD do what
