@@ -237,7 +237,11 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 
 	*start = ps - ptprompt->name;
 	ps = ptprompt->name + *start;
+	if (ptprompt_next->name == NULL) {
+		return 0;
+	}
 	ps_next = ptprompt_next->name + *start;
+
 
 	while(*ps == *ps_next) {
 		printf("%c %c", *ps++, *ps_next++);
@@ -387,12 +391,13 @@ int autocompletion(int cnt, int key)
 			printf("ps %s %d %d\n", ps, start, end );
 			memcpy(strout,ps + start, end - start);
 			strout[end - start] = '\0';
+			printf("%s%s", rl_prompt, rl_line_buffer);
 			rl_insert_text(strout);
-			printf(" auto after [%s]\n", rl_line_buffer);
+			// printf(" auto after [%s]\n", rl_line_buffer);
 			}
 			break;
 		case 2:
-			sh_display_match(plist, cmd[count - 1]);
+			
 			sh_completion_head(plist, cmd[count - 1],
 				index, &start, &end);
 			char strout[24];
@@ -402,8 +407,11 @@ int autocompletion(int cnt, int key)
 			ps = ptprompt->name;
 			memcpy(strout,ps + start, end - start);
 			strout[end - start] = '\0';
+			printf("%s%s", rl_prompt, rl_line_buffer);
+			sh_display_match(plist, cmd[count - 1]);
 			rl_insert_text(strout);
-			printf(" auto after [%s]\n", rl_line_buffer);
+
+			// printf(" auto after [%s]\n", rl_line_buffer);
 			break;
 		default:
 			break;
