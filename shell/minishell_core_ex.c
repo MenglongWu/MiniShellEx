@@ -59,8 +59,12 @@ void sh_detach_fmt2 (char *fmt,long len, struct sh_detach_depth *depth)
 	}
 	depth->count = index;
 }
-void sh_display_prompt(struct cmd_prompt *pprompt);
 
+int sh_check_match(struct cmd_prompt *pprompt, char *text,int *index);
+void sh_display_prompt(struct cmd_prompt *pprompt);
+void sh_display_match(struct cmd_prompt *plist, char *text);
+int sh_completion_head(struct cmd_prompt *plist, char *text,
+	int index,int *start, int *end);
 int
 searchboot(
 		int argc, 
@@ -143,6 +147,108 @@ void sh_display_prompt(struct cmd_prompt *pprompt)
 		ptprompt++;
 	}
 }
+
+// 检查有多少个匹配
+/**
+ * @brief	检查有多少个匹配，条件是pprompt里的内容是按字母顺序排列的
+ * @param	pprompt 检查列表
+ * @param	text 检查对象
+ * @param	index 输出值，从pprompt第几个开始有匹配
+ * @retval	0 没有匹配
+ * @retval	1 仅有1个匹配
+ * @retval	2 有 >= 2个匹配
+ */
+
+int sh_check_match(struct cmd_prompt *pprompt, char *text,int  *index)
+{
+	struct cmd_prompt *ptprompt;
+	int len, ret;
+	int count = 0;
+
+	ptprompt = pprompt;
+	len = strlen(text);
+	printf("\n");
+
+
+	// 找到第一个匹配的
+	while( ptprompt->name ) {
+		ret = memcmp(ptprompt->name, text, len);
+		if (ret == 0) {
+			count++;
+			goto _FindSecend;
+		}
+		ptprompt++;
+	}
+	return 0;
+
+_FindSecend:;
+	// 记录匹配个数
+	*index = (ptprompt - pprompt);
+	ptprompt++;// 移动到下一个
+	while( ptprompt->name ) {
+		ret = memcmp(ptprompt->name, text, len);
+		if (ret == 0) {
+			return 2;
+		}
+		else {
+			break;
+		}
+		ptprompt++;
+	}	
+	return 1;
+}
+// 列出半匹配字符串
+void sh_display_match(struct cmd_prompt *pprompt, char *text)
+{
+	struct cmd_prompt *ptprompt;
+	int len, ret;
+
+	ptprompt = pprompt;
+	len = strlen(text);
+	printf("\n");
+	while( ptprompt->name ) {
+		ret = memcmp(ptprompt->name, text, len);
+		if (ret == 0) {
+			printf("ret %d %s\n",ret, ptprompt->name);
+		}
+		ptprompt++;
+	}
+	return 0;
+}
+
+// start end返回从start到end需要插入的字符串
+int sh_completion_head(struct cmd_prompt *pprompt, char *text,
+	int index, int *start, int *end)
+{
+	struct cmd_prompt *ptprompt, *ptprompt_next;
+	int len, ret;
+
+	ptprompt = pprompt + index;
+	ptprompt_next = pprompt + index + 1;
+	len = strlen(text);
+	printf("\n");
+	int i = 0;
+	printf("next  %s \n", ptprompt->name);
+	char *ps,*ps_next;
+	ps = ptprompt->name;
+	while(*ps == *text) {
+		printf("%c %c", *ps++, *text++);
+	}
+
+	*start = ps - ptprompt->name;
+	ps = ptprompt->name + *start;
+	ps_next = ptprompt_next->name + *start;
+
+	while(*ps == *ps_next) {
+		printf("%c %c", *ps++, *ps_next++);
+	}
+	*end = ps - ptprompt->name;
+	printf("sta %d end %d\n", *start, *end);
+
+
+	return 0;
+}
+
 void sh_list(char *text, int len, struct cmd_prompt *boot)
 {
 
@@ -156,6 +262,7 @@ extern struct cmd_prompt cmd_boot[];
 
 extern char *rl_display_prompt ;
 int funtest2(int a, int b);
+int autocompletion(int a, int b);
 int funtest(int a, int b)
 {
 	_prompt_tree[0] = &cmd_boot[0];
@@ -164,7 +271,7 @@ int funtest(int a, int b)
 	printf ("a = %d b = %d\n", a, b);
 	// printf("[%s]", rl_display_prompt);
 	rl_bind_key('?',funtest2);
-	// rl_bind_key('\t',funtest2);
+	rl_bind_key('\t',autocompletion);
 	return 0;
 }	
 
@@ -178,6 +285,7 @@ struct cmd_prompt *sh_down_prompt_level(
 	return _prompt_tree[_prompt_index-1];
 }
 
+// struct cmd_prompt *gp_index;// =  _prompt_tree[0];
 
 struct cmd_prompt *sh_up_prompt_level(void)
 {
@@ -189,7 +297,7 @@ struct cmd_prompt *sh_up_prompt_level(void)
 }
 
 
-
+extern int rl_line_buffer_len, rl_end;
 int funtest2(int cnt, int key)
 {
 	int len    = strlen(rl_line_buffer);
@@ -210,32 +318,109 @@ int funtest2(int cnt, int key)
 	
 	struct cmd_prompt *plist;
 	int ret;
-	printf("index %d\n", _prompt_index);
+	printf("index %d %d %d\n", _prompt_index, count, len);
 	ret = searchboot(count, cmd, _prompt_tree[_prompt_index], &plist);
+
 	// printf("ret = %d\n", ret);
 	if (ret == 0 || ret == 1) {
 		// sh_display_prompt(plist);
 		sh_display_prompt(plist);
+
 	}
 	else if (ret == 2){
 		printf("\t<cr>        Enter \n");
 	}
-	// else if (ret == 0) {
-	// else {
-
-	// 	printf("\t<cr> Enter %x\n", plist);
-	// }
-	
-
-
 #ifdef MINISHELL_USE_MALLOC
 	free(pbuf);
 #endif
 	printf("%s%s", rl_prompt, rl_line_buffer);
-	// rl_on_new_line();
 	return 0;
 }	
 
+int autocompletion(int cnt, int key)
+{
+	int len    = strlen(rl_line_buffer);
+#ifdef MINISHELL_USE_MALLOC
+	char *pbuf = (char*)malloc(len);
+#else
+	char buf[1024];
+	char *pbuf = buf;
+#endif
+	char *cmd[256];
+	int count;
+	// rl_vi_put (2,'?');
+	// return 0;
+	memcpy(pbuf, rl_line_buffer, len);
+
+
+	sh_detach_fmt(pbuf, len, cmd, &count);
+	
+	struct cmd_prompt *plist;
+	int ret;
+	printf("index %d %d %d\n", _prompt_index, count, len);
+	ret = searchboot(count - 1, cmd, _prompt_tree[_prompt_index], &plist);
+
+	if (ret == 0 || ret == 1) {
+		// todo 自动填充
+		// sh_display_prompt(plist);
+		printf("cmd %s %s\n", cmd[count - 1], plist->name);
+
+		int index;
+		ret = sh_check_match(plist, cmd[count - 1], &index);
+		printf("match count %d from %d\n", ret, index);
+
+		int start, end;
+		
+		switch(ret) {
+		case 0:
+			break;
+		case 1:
+			sh_completion_head(plist, cmd[count - 1],
+				index, &start, &end);
+			{
+			char strout[24];
+			char *ps;
+			struct cmd_prompt *ptprompt;
+			ptprompt = plist + index;
+			ps = ptprompt->name;
+			end = strlen(ps) + 1;
+			printf("ps %s %d %d\n", ps, start, end );
+			memcpy(strout,ps + start, end - start);
+			strout[end - start] = '\0';
+			rl_insert_text(strout);
+			printf(" auto after [%s]\n", rl_line_buffer);
+			}
+			break;
+		case 2:
+			sh_display_match(plist, cmd[count - 1]);
+			sh_completion_head(plist, cmd[count - 1],
+				index, &start, &end);
+			char strout[24];
+			char *ps;
+			struct cmd_prompt *ptprompt;
+			ptprompt = plist + index;
+			ps = ptprompt->name;
+			memcpy(strout,ps + start, end - start);
+			strout[end - start] = '\0';
+			rl_insert_text(strout);
+			printf(" auto after [%s]\n", rl_line_buffer);
+			break;
+		default:
+			break;
+		}
+		
+
+		
+	}
+	else if (ret == 2){
+		// printf("\t<cr>        Enter \n");
+	}
+#ifdef MINISHELL_USE_MALLOC
+	free(pbuf);
+#endif
+	// printf("%s%s", rl_prompt, rl_line_buffer);
+	return 0;
+}	
 void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 {
 	//char (*cmd)[10];
@@ -274,7 +459,11 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 
 		if(find == 1) {
 			if (pstart->fun) {
-				pstart->fun(NULL, depth2->count, (char **)cmd);
+				for (int i = 0; i < depth2->count;i++) {
+					printf("%d %s \n", i, depth2->cmd[i]);
+				}
+				// pstart->fun(NULL, depth2->count, (char **)cmd);
+				pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
 			}
 		}
 		else {
@@ -356,10 +545,10 @@ int sh_enter_ex(struct sh_detach_depth *env)
 		if (*input != '\0') {
 			add_history(input);
 			sh_analyse_ex(input, strlen(input), penv);
-			if(0 == strcmp(input, "quit")) {
-				printf("\r\n");
-				break;
-			}
+			// if(0 == strcmp(input, "quit")) {
+			// 	printf("\r\n");
+			// 	break;
+			// }
 		}
 	}
 
