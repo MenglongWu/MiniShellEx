@@ -46,19 +46,16 @@ void sh_detach_fmt2 (char *fmt,long len, struct sh_detach_depth *depth)
 	// char *cmd[256],
 	char *token = NULL;	
 	int   index = 0;
-	char  seps[] = " ,\t\n";
+	// char  seps[] = " ,\t\n";
 
 	//step 1:提取第一个单词，并在命令列表里寻找是否存在命令
 	*(fmt+len) = '\0';
-	token = strtok(fmt,seps);
-
-
-	// printf("fun addr %x %x\n", depth->cmd[0],  depth->cmd[1] );
-	while(token != NULL) {
-		// depth->cmd[index] = token;
+	token = strtok(fmt,depth->seps);
+	
+	while(token != NULL && index < depth->len) {
 		depth->cmd[index] = token;
 		index++;
-		token = strtok(NULL,seps);	
+		token = strtok(NULL,depth->seps);	
 	}
 	depth->count = index;
 }
@@ -167,6 +164,7 @@ int funtest(int a, int b)
 	printf ("a = %d b = %d\n", a, b);
 	// printf("[%s]", rl_display_prompt);
 	rl_bind_key('?',funtest2);
+	// rl_bind_key('\t',funtest2);
 	return 0;
 }	
 
@@ -192,7 +190,7 @@ struct cmd_prompt *sh_up_prompt_level(void)
 
 
 
-int funtest2(int a, int b)
+int funtest2(int cnt, int key)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -203,12 +201,14 @@ int funtest2(int a, int b)
 #endif
 	char *cmd[256];
 	int count;
+	// rl_vi_put (2,'?');
+	// return 0;
 	memcpy(pbuf, rl_line_buffer, len);
+
 
 	sh_detach_fmt(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
-	putchar('\n');
 	int ret;
 	printf("index %d\n", _prompt_index);
 	ret = searchboot(count, cmd, _prompt_tree[_prompt_index], &plist);
@@ -232,7 +232,7 @@ int funtest2(int a, int b)
 	free(pbuf);
 #endif
 	printf("%s%s", rl_prompt, rl_line_buffer);
-
+	// rl_on_new_line();
 	return 0;
 }	
 
@@ -325,20 +325,21 @@ int sh_enter_ex(struct sh_detach_depth *env)
 	memcpy(g_envLocal.host, "MiniShell\0", 10);
 	g_envLocal.path[0] = '\0';
 
-	char *cmd[12];
+	char *cmd[256];
 	struct sh_detach_depth local;
-	local.cmd = cmd;
-	local.len = 4;
-	local.count = 0;
-	local.seps = _seps;
-	local.cmd[1] = "abcd";
+	
 	if (env) {
 		penv = env;
 	}
 	else {
+		local.cmd = cmd;
+		local.len = 256;
+		local.count = 0;
+		local.seps = _seps;
+		local.cmd[1] = "abcd";
 		penv = &local;
 	}
-	penv = &local;
+	// penv = &local;
 
 	while(1) {
 

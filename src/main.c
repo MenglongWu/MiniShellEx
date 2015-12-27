@@ -7,19 +7,24 @@
 
 int do_c1_ex(int argc, char **argv);
 int do_c2_ex(int argc, char **argv);
+int do_up_level(int argc, char **argv);
 
 struct cmd_prompt cmd_1[] = {
   // {(struct cmd_prompt  *)(NULL),(char*)("ddd"), (char*)(), (int)(d)},
-  PROMPT_NODE(NULL, do_c1_ex,"11", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(NULL, do_c2_ex,"12", "abc", NULL),
-  PROMPT_NODE(NULL, do_c2_ex,"c2", "abc", NULL),
+  PROMPT_NODE(NULL, NULL,"11", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(NULL, NULL,"12", "abc", NULL),
+  PROMPT_NODE(NULL, NULL,"c2", "abc", NULL),
+  PROMPT_NODE(NULL, do_up_level,"ul", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(NULL, NULL,"quit", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
 
 struct cmd_prompt cmd_2[] = {
-  PROMPT_NODE(NULL, do_c1_ex,"++", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(NULL, do_c2_ex,"--", "abc", NULL),
-  PROMPT_NODE(NULL, do_c2_ex,"c2", "abc", NULL),
+  PROMPT_NODE(NULL, NULL,"++", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(NULL, NULL,"--", "abc", NULL),
+  PROMPT_NODE(NULL, NULL,"c2", "abc", NULL),
+  PROMPT_NODE(NULL, do_up_level,"ul", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(NULL, NULL,"quit", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
 
@@ -27,29 +32,33 @@ struct cmd_prompt cmd_2[] = {
 
 struct cmd_prompt cmd_boot[] = {
   // PROMPT_NODE("'param'","<osw frame/slot/port>",NULL,NULL),
-  PROMPT_NODE(cmd_1, do_c1_ex,"c1--", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(cmd_2, do_c2_ex,"c2", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(cmd_1, do_c1_ex,"c111", "<osw frame/slot/port>", NULL),
+  PROMPT_NODE(cmd_2, do_c2_ex,"c222", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(cmd_2, SH_FUN_NULL,"c12", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(cmd_2, do_c1_ex,"c11", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(cmd_2, do_c2_ex,"c1224", "<osw frame/slot/port>", NULL),
-  PROMPT_NODE(cmd_2, NULL,"c1331", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, NULL,"quit", "<osw frame/slot/port>", NULL),
   PROMPT_NODE(NULL, NULL,NULL, NULL, NULL),
 };
+
 
 int do_c1(int argc, char **argv)
 {
   // struct cmd_prompt *sh_downlevel(
   //   struct cmd_prompt *level)
-  printf("old  \n");
+  // printf("old  \n");
   sh_down_prompt_level(cmd_1);
 }
 
 int do_c2(int argc, char **argv)
 {
-  // struct cmd_prompt *sh_downlevel(
-  //   struct cmd_prompt *level)
+  // printf("old  \n");
+  sh_down_prompt_level(cmd_2);
+  return 0;
+}
+
+int do_up_level(int argc, char **argv)
+{
   sh_up_prompt_level();
+  return 0;
 }
 
 int do_c1_ex(int argc, char **argv)
@@ -72,7 +81,13 @@ void main()
 {
   funtest();
   initialize_readline();
-  sh_enter_ex(NULL);
+  struct sh_detach_depth depth;
+  char *cmd[12];
+
+  depth.cmd = cmd;
+  depth.len = 12;
+  depth.seps = " \t";
+  sh_enter_ex(&depth);
 }
 
 
@@ -105,11 +120,11 @@ COMMAND commands[] = {
 
 
 char **
-fileman_completion (
+_sh_fileman_completion (
     const char *text,
     int start, int end);
 static char *
-command_generator (
+_sh_command_generator (
     const char *text,
     int state);
 extern const char *rl_readline_name ;
@@ -120,11 +135,11 @@ initialize_readline ()
   rl_readline_name = "FileMan";
 
   /* Tell the completer that we want a crack first. */
-  rl_attempted_completion_function = fileman_completion;
+  rl_attempted_completion_function = _sh_fileman_completion;
 }
 
 char **
-fileman_completion (
+_sh_fileman_completion (
     const char *text,
     int start, int end)
 {
@@ -136,7 +151,7 @@ fileman_completion (
      to complete.  Otherwise it is the name of a file in the current
      directory. */
   if (start == 0)
-    matches = rl_completion_matches (text, command_generator);
+    matches = rl_completion_matches (text, _sh_command_generator);
 
   return (matches);
 }
@@ -145,14 +160,16 @@ fileman_completion (
 *rl_complete_internal
 * gen_completion_matches
 *   rl_completion_matches
-*     command_generator
+*     _sh_command_generator
 *       malloc
 * free
 */
-
+#define PROMPT_DEPTH (16)
+extern struct cmd_prompt *_prompt_tree[PROMPT_DEPTH];
+extern int         _prompt_index;
 
 static char *
-dupstr (s)
+_sh_dupstr (s)
 char *s;
 {
   char *r;
@@ -166,7 +183,7 @@ char *s;
    to start from scratch; without any state (i.e. STATE == 0), then we
    start at the top of the list. */
 char *
-command_generator (
+_sh_command_generator (
     const char *text,
     int state)
 {
@@ -182,12 +199,11 @@ command_generator (
   }
 
   /* Return the next name which partially matches from the command list. */
-  // while (name = commands[list_index].name)
-  while (name = cmd_boot[list_index].name) {
+  // while (name = commands[list_index].name) {
+  while (name = _prompt_tree[_prompt_index][list_index].name) {
     list_index++;
-
     if (strncmp (name, text, len) == 0)
-      return (dupstr(name));
+      return (_sh_dupstr(name));
   }
 
   /* If no names matched, then return NULL. */
