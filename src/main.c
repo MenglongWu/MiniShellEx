@@ -1,5 +1,6 @@
 #include "stdio.h"
 #include <minishell_core.h>
+#include "shell.h"
 
 // #ifdef __cplusplus
 // extern "C" {
@@ -112,6 +113,10 @@ int do_c2_ex(int argc, char **argv)
 // const char str[] = "asbcdfasf";
 void main()
 {
+  // sh_cmdboot(cmd_tbl_list);
+  // sh_enter();
+
+
   funtest();
   // initialize_readline();
   struct sh_detach_depth depth;
@@ -120,7 +125,10 @@ void main()
   depth.cmd = cmd;
   depth.len = 12;
   depth.seps = " \t";
+
+
   sh_enter_ex(&depth);
+
 }
 
 

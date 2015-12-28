@@ -51,11 +51,9 @@ extern "C" {
 	#include "malloc.h"
 	#include <readline/readline.h>
 	#include <readline/history.h>
-	#include "shell.h"
 #else
 	#include "board.h"
 	#include "linux/string.h"
-	#include "shell.h"
 #endif
 
 
@@ -74,22 +72,39 @@ volatile int __wcmd_end   __attribute__ ((section (".w_boot_end"))) = 0;
 //命令列表
 
 #ifdef CMD_ARRAY
-static struct cmd_table cmd_tbl_list[] = {
-	// INIT_CMD define in shell/shell.h
-	INIT_CMD,
+static struct cmd_table *_ptab_list = (struct cmd_table *)NULL;
+static struct cmd_table *_ptab_list_end = (struct cmd_table *)NULL;
+// static struct cmd_table cmd_tbl_list[] = {
+// 	// INIT_CMD define in shell/shell.h
+// 	INIT_CMD,
 
-	{(char *)"help", do_help, (char *)"shell help"},
-	{(char *)"quit", do_null, (char *)"quit shell"},
+// 	{(char *)"help", do_help, (char *)"shell help"},
+// 	{(char *)"quit", do_null, (char *)"quit shell"},
 
-	// SHELL_REG_CMD(0,0,0),
-	{0, 0, 0},
-};
+// 	// SHELL_REG_CMD(0,0,0),
+// 	{0, 0, 0},
+// };
 
 #endif
 
 struct env g_envLocal;
 
+void sh_cmdboot(struct cmd_table *boot)
+{
+#ifdef CMD_ARRAY
+	if (!boot) {
+		return ;
+	}
 
+	_ptab_list = boot;
+	_ptab_list_end = boot;
+
+	while(_ptab_list_end->name) {
+		_ptab_list_end++;
+	}
+#endif
+
+}
 //*****************************************************************************
 //默认命令
 #if(1) //SHELL_REG_CMD宏才用到该函数

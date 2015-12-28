@@ -88,6 +88,7 @@ extern struct env g_envLocal;
 extern int do_help(int argc, char **argv);
 extern int do_null(int argc, char **argv);
 extern int do_hostname(int argc, char **argv);
+extern void sh_cmdboot(struct cmd_table *boot);
 extern int sh_enter();
 extern void sh_editpath(char *path);
 extern void sh_analyse (char *fmt, long len);
@@ -137,8 +138,10 @@ extern struct cmd_prompt *sh_up_prompt_level(void);
 
 //MINISHELL_START\MINISHELL_END
 #ifdef CMD_ARRAY
-	#define MINISHELL_START(p) (p = &cmd_tbl_list[0])
-	#define MINISHELL_END(p) (p = &cmd_tbl_list[0] + sizeof(cmd_tbl_list)/sizeof(struct cmd_table) - 1)
+	// #define MINISHELL_START(p) (p = &cmd_tbl_list[0])
+	// #define MINISHELL_END(p) (p = &cmd_tbl_list[0] + sizeof(cmd_tbl_list)/sizeof(struct cmd_table) - 1)
+	#define MINISHELL_START(p) (p = _ptab_list)
+	#define MINISHELL_END(p) (p = _ptab_list_end)
 #endif
 
 
