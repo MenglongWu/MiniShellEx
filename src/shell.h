@@ -3,7 +3,7 @@
 
 
 
-struct cmd_table cmd_tbl_list[];
+extern struct cmd_table cmd_tbl_list[];
 	
 #endif
 

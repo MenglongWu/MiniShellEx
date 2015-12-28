@@ -90,6 +90,7 @@ extern int do_null(int argc, char **argv);
 extern int do_hostname(int argc, char **argv);
 extern void sh_cmdboot(struct cmd_table *boot);
 extern int sh_enter();
+extern int sh_enter_ex(struct sh_detach_depth *env);
 extern void sh_editpath(char *path);
 extern void sh_analyse (char *fmt, long len);
 extern void sh_editpath(char *path);
@@ -115,7 +116,7 @@ extern struct cmd_prompt *sh_up_prompt_level(void);
 #define PROMPT_NODE(a,f,b,c,d) \
 { \
 	.next = (struct cmd_prompt	*)(a), \
-	.fun  = (int (*)(int argc, char **argv))f, \
+	.fun  = (int (*)(void *, int , char **))f, \
 	.name = (char*)(b), \
 	.help = (char*)(c), \
 	.type = (int)(d), \
