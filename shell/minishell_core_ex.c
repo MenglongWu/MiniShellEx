@@ -217,7 +217,7 @@ void sh_display_match(struct cmd_prompt *pprompt, char *text)
 		}
 		ptprompt++;
 	}
-	return 0;
+	// return 0;
 }
 
 // start end返回从start到end需要插入的字符串
@@ -458,7 +458,7 @@ int autocompletion(int cnt, int key)
 	// printf("%s%s", rl_prompt, rl_line_buffer);
 	return 0;
 }	
-void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
+void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2, void *ptr)
 {
 	//char (*cmd)[10];
 	char *cmd[256], *token = NULL;
@@ -500,7 +500,8 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 				// 	printf("%d %s \n", i, depth2->cmd[i]);
 				// }
 				// pstart->fun(NULL, depth2->count, (char **)cmd);
-				pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
+				// pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
+				pstart->fun(ptr, depth2->count, (char **)&depth2->cmd[0]);
 			}
 		}
 		else {
@@ -541,7 +542,7 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 	}
 }
 
-int sh_enter_ex(struct sh_detach_depth *env)
+int sh_enter_ex(struct sh_detach_depth *env, void *ptr)
 {
 	char shell_prompt[256];
 	char *input = (char *)NULL;
@@ -581,7 +582,7 @@ int sh_enter_ex(struct sh_detach_depth *env)
 		}
 		if (*input != '\0') {
 			add_history(input);
-			sh_analyse_ex(input, strlen(input), penv);
+			sh_analyse_ex(input, strlen(input), penv, ptr);
 			// if(0 == strcmp(input, "quit")) {
 			// 	printf("\r\n");
 			// 	break;

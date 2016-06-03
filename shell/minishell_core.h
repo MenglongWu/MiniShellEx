@@ -90,7 +90,7 @@ extern int do_null(int argc, char **argv);
 extern int do_hostname(int argc, char **argv);
 extern void sh_cmdboot(struct cmd_table *boot);
 extern int sh_enter();
-extern int sh_enter_ex(struct sh_detach_depth *env);
+extern int sh_enter_ex(struct sh_detach_depth *env, void *ptr);
 extern void sh_editpath(char *path);
 extern void sh_analyse (char *fmt, long len);
 extern void sh_editpath(char *path);
