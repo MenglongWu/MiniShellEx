@@ -12,7 +12,7 @@
 #include <readline/history.h>
 const char _seps[] = " ,\t\n";
 
-
+// #define MINISHELL_DBG
 int do_undo_ex(void *ptr, int argc, char **argv)
 {
 	return 0;
@@ -209,7 +209,11 @@ void sh_display_match(struct cmd_prompt *pprompt, char *text)
 	while( ptprompt->name ) {
 		ret = memcmp(ptprompt->name, text, len);
 		if (ret == 0) {
+#ifdef MINISHELL_DBG
 			printf("ret %d %s\n",ret, ptprompt->name);
+#else
+			printf("%s\n",ptprompt->name);
+#endif
 		}
 		ptprompt++;
 	}
@@ -226,13 +230,21 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 	ptprompt = pprompt + index;
 	ptprompt_next = pprompt + index + 1;
 	len = strlen(text);
+#ifdef MINISHELL_DBG
 	printf("\n");
+#endif
 	int i = 0;
+#ifdef MINISHELL_DBG	
 	printf("next  %s \n", ptprompt->name);
+#endif
 	char *ps,*ps_next;
 	ps = ptprompt->name;
 	while(*ps == *text) {
-		printf("%c %c", *ps++, *text++);
+#ifdef MINISHELL_DBG
+		printf("%c %c", *ps, *text);
+#endif
+		ps++;
+		text++;
 	}
 
 	*start = ps - ptprompt->name;
@@ -244,10 +256,16 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 
 
 	while(*ps == *ps_next) {
+#ifdef MINISHELL_DBG
 		printf("%c %c", *ps++, *ps_next++);
+#endif
+		ps++;
+		ps_next++;
 	}
 	*end = ps - ptprompt->name;
+#ifdef MINISHELL_DBG	
 	printf("sta %d end %d\n", *start, *end);
+#endif
 
 
 	return 0;
@@ -322,7 +340,10 @@ int funtest2(int cnt, int key)
 	
 	struct cmd_prompt *plist;
 	int ret;
+#ifdef MINISHELL_DBG
 	printf("index %d %d %d\n", _prompt_index, count, len);
+#endif
+
 	ret = searchboot(count, cmd, _prompt_tree[_prompt_index], &plist);
 
 	// printf("ret = %d\n", ret);
@@ -332,7 +353,7 @@ int funtest2(int cnt, int key)
 
 	}
 	else if (ret == 2){
-		printf("\t<cr>        Enter \n");
+		printf("\n\t<cr>        Enter \n");
 	}
 #ifdef MINISHELL_USE_MALLOC
 	free(pbuf);
@@ -361,18 +382,23 @@ int autocompletion(int cnt, int key)
 	
 	struct cmd_prompt *plist;
 	int ret;
+#ifdef MINISHELL_DBG
 	printf("index %d %d %d\n", _prompt_index, count, len);
+#endif
 	ret = searchboot(count - 1, cmd, _prompt_tree[_prompt_index], &plist);
 
 	if (ret == 0 || ret == 1) {
 		// todo 自动填充
 		// sh_display_prompt(plist);
+#ifdef MINISHELL_DBG
 		printf("cmd %s %s\n", cmd[count - 1], plist->name);
+#endif
 
 		int index;
 		ret = sh_check_match(plist, cmd[count - 1], &index);
+#ifdef MINISHELL_DBG
 		printf("match count %d from %d\n", ret, index);
-
+#endif
 		int start, end;
 		
 		switch(ret) {
@@ -388,7 +414,9 @@ int autocompletion(int cnt, int key)
 			ptprompt = plist + index;
 			ps = ptprompt->name;
 			end = strlen(ps) + 1;
+#ifdef MINISHELL_DBG
 			printf("ps %s %d %d\n", ps, start, end );
+#endif
 			memcpy(strout,ps + start, end - start);
 			strout[end - start] = '\0';
 			printf("%s%s", rl_prompt, rl_line_buffer);
@@ -412,6 +440,7 @@ int autocompletion(int cnt, int key)
 			rl_insert_text(strout);
 
 			// printf(" auto after [%s]\n", rl_line_buffer);
+			printf("%s%s", rl_prompt, rl_line_buffer);
 			break;
 		default:
 			break;
@@ -467,9 +496,9 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 
 		if(find == 1) {
 			if (pstart->fun) {
-				for (int i = 0; i < depth2->count;i++) {
-					printf("%d %s \n", i, depth2->cmd[i]);
-				}
+				// for (int i = 0; i < depth2->count;i++) {
+				// 	printf("%d %s \n", i, depth2->cmd[i]);
+				// }
 				// pstart->fun(NULL, depth2->count, (char **)cmd);
 				pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
 			}
