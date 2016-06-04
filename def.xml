@@ -8,12 +8,12 @@
 </group>
 
 <group name="boot2">
-<item name="cmd21"  boot="boo1" help="help 2">sss33</item>
-<item name="cmd22`"  boot=""  help="help 3">sss33</item>
+<item name="cmd21"  boot="boot1" help="help 2">sss33</item>
+<item name="cmd22"  boot=""  help="help 3">sss33</item>
 </group>
 
 <group name="boot3">
-<item   boot="" alias="c31">sss33</item>
+<item  name="cmd31" boot="" alias="c31">sss33</item>
 <item name="cmd32"  boot="" alias="c32">sss33</item>
 </group>
 

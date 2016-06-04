@@ -280,14 +280,24 @@ void sh_list(char *text, int len, struct cmd_prompt *boot)
 struct cmd_prompt *_prompt_tree[PROMPT_DEPTH];
 int         _prompt_index = 0;
 
-extern struct cmd_prompt cmd_boot[];
+#ifdef AUTO_BUILD
+	extern struct cmd_prompt boot_boot1[];
+#else
+	extern struct cmd_prompt cmd_boot[];
+#endif
+
+
 
 extern char *rl_display_prompt ;
 int funtest2(int a, int b);
 int autocompletion(int a, int b);
 int funtest(int a, int b)
 {
+#ifdef AUTO_BUILD
+	_prompt_tree[0] = &boot_boot1[0];
+#else
 	_prompt_tree[0] = &cmd_boot[0];
+#endif
 	_prompt_index    = 0;
 	
 	printf ("a = %d b = %d\n", a, b);

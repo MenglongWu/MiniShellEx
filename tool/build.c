@@ -548,9 +548,9 @@ void create_cmditem(FILE *fp, struct item *val)
 
 
 		
-
+		printf("name %s\n", pnode->name);
 		if (pnode->boot && strcmp(pnode->boot, "") != 0) {
-			fprintf(fp, "\tPROMPT_NODE(%s",pnode->boot);
+			fprintf(fp, "\tPROMPT_NODE(boot_%s",pnode->boot);
 		}
 		else {
 			fprintf(fp, "\tPROMPT_NODE(NULL");
@@ -580,13 +580,14 @@ void create_cmditem(FILE *fp, struct item *val)
 
 		if (pnode->help) {
 			help = pnode->help;
-			fprintf(fp, ",\n\t\t (char*)\"%s\"),\n",
+			fprintf(fp, ",\n\t\t (char*)\"%s\"\n",
 				help);
 		}
 		else {
 			help = "NULL";
-			fprintf(fp, ",\n\t\t (char*)NULL),\n");
+			fprintf(fp, ",\n\t\t (char*)NULL\n");
 		}
+		fprintf(fp, ",\n\t\t NULL),\n");
 		
 		
 	}
@@ -603,6 +604,10 @@ void create_cmditem_define(FILE *fp, struct item *val)
 				pnode->name);
 	}
 }
+
+// void create_cmdgroup_define(FILE *fp, struct group *val)
+// {
+// }
 
 void create_cmditem_fb(FILE *fp, struct item *val)
 {
@@ -625,12 +630,24 @@ void create_cmdboot(char *file, struct group *val)
 	struct group *pnode;
 	struct list_head *pos, *n;
 
-	fp = fopen("af.c", "wr");
+	fp = fopen("cmd_output.c", "wr");
 
+
+	fprintf(fp, "#include <minishell_core.h>\n\n");
 	list_for_each_safe(pos, n, &val->list) {
+		pnode = (struct group*)list_entry(pos, struct group, list);
 		create_cmditem_define(fp, pnode->item_first);
 	}
 	fprintf(fp, "\n\n\n");
+
+
+	list_for_each_safe(pos, n, &val->list) {
+		pnode = (struct group*)list_entry(pos, struct group, list);
+		// create_cmditem_define(fp, pnode->item_first);
+		printf("boot name %s\n", pnode->name);
+		fprintf(fp, "struct cmd_prompt boot_%s[];\n", pnode->name);
+	}
+	fprintf(fp, "\n\n");
 
 
 	list_for_each_safe(pos, n, &val->list) {
@@ -643,6 +660,7 @@ void create_cmdboot(char *file, struct group *val)
 
 
 	list_for_each_safe(pos, n, &val->list) {
+		pnode = (struct group*)list_entry(pos, struct group, list);
 		create_cmditem_fb(fp, pnode->item_first);
 	}
 	fprintf(fp, "\n\n\n");

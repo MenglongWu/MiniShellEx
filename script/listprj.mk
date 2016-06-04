@@ -8,6 +8,8 @@
 		pi1_arg=bin
 	pi4=script/tool-build
 		pi4_arg=bin
+	pi5=script/test
+		pi5_arg=bin
 
 	pi2=script/prj_liba
 		pi2_arg=mlib

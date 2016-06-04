@@ -131,7 +131,7 @@ int main()
 	depth.seps = " \t";
 
 
-	sh_enter_ex(&depth);
+	sh_enter_ex(&depth, NULL);
 
 	return 0;
 }
