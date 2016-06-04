@@ -6,6 +6,8 @@
 # pixxx_arg=[all,mlib,elf...] one of us, [all, mlib,elf...] is top path Makefile operation
 	pi1=script/minishellex_example
 		pi1_arg=bin
+	pi4=script/tool-build
+		pi4_arg=bin
 
 	pi2=script/prj_liba
 		pi2_arg=mlib
@@ -14,4 +16,4 @@
 		pi3_arg=mlib
 
 # default project item
-export DP=pi1
+export DP=pi4

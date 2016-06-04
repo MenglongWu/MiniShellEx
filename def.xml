@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<bookstore>
+
+<group name="boot1" abc="sd">
+<item name="cmd11222" boot="boot2">ss12s</item>
+<item name="cmd12" boot="boot3" >ss12s</item>
+</group>
+
+<group name="boot2">
+<item name="cmd21"  boot="boo1" help="help 2">sss33</item>
+<item name="cmd22`"  boot=""  help="help 3">sss33</item>
+</group>
+
+<group name="boot3">
+<item   boot="" alias="c31">sss33</item>
+<item name="cmd32"  boot="" alias="c32">sss33</item>
+</group>
+
+
+
+</bookstore>
