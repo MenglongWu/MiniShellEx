@@ -680,7 +680,8 @@ int main3()
 	// sh_enter();
 	// void (*fun)(int);
 	// fun = (void(*)(void))do_interface;
-	funtest();
+	sh_whereboot(cmd_boot);
+	// funtest();
 	// initialize_readline();
 	struct sh_detach_depth depth;
 	char *cmd[12];
@@ -839,7 +840,7 @@ _sh_command_generator3 (
 	memcpy(pbuf, rl_line_buffer, len);
 
 
-	sh_detach_fmt(pbuf, len, cmd, &count);
+	sh_detach_xx_fmt(pbuf, len, cmd, &count);
 
 	struct cmd_prompt *plist;
 	int ret;

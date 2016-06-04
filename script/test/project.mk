@@ -7,7 +7,7 @@ PRJ_NAME = "Hello-KuGo_Menglong"
 # CROSS_COMPILE = /opt/EmbedSky/crosstools_3.4.5_softfloat/gcc-3.4.5-glibc-2.3.6/arm-linux/bin/arm-linux-
 
 # default download.elf,download.dis,download.bin
-OUTPUT_ELF	= msbuild
+OUTPUT_ELF	= testbuild
 OUTPUT_DIS	=
 OUTPUT_BIN	= 
 OUTPUT_SO 	= 

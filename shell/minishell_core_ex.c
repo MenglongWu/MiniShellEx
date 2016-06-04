@@ -22,7 +22,10 @@ int do_undo_ex(void *ptr, int argc, char **argv)
 // {
 
 // }
-void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
+/*
+	detach string and auto completion
+*/
+void sh_detach_fmt_ac (char *fmt,long len, char **cmd, int *count)
 {
 	// char *cmd[256],
 	char *token = NULL;	
@@ -41,7 +44,10 @@ void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
 	*count = index;
 }
 
-void sh_detach_fmt2 (char *fmt,long len, struct sh_detach_depth *depth)
+/*
+	忘记下面的代码是用来调试上面东西的了
+*/
+void sh_detach_xx_fmt (char *fmt,long len, struct sh_detach_depth *depth)
 {
 	// char *cmd[256],
 	char *token = NULL;	
@@ -288,24 +294,7 @@ int         _prompt_index = 0;
 
 
 
-extern char *rl_display_prompt ;
-int funtest2(int a, int b);
-int autocompletion(int a, int b);
-int funtest(int a, int b)
-{
-#ifdef AUTO_BUILD
-	_prompt_tree[0] = &boot_boot1[0];
-#else
-	_prompt_tree[0] = &cmd_boot[0];
-#endif
-	_prompt_index    = 0;
-	
-	printf ("a = %d b = %d\n", a, b);
-	// printf("[%s]", rl_display_prompt);
-	rl_bind_key('?',funtest2);
-	rl_bind_key('\t',autocompletion);
-	return 0;
-}	
+
 
 struct cmd_prompt *sh_down_prompt_level(
 	struct cmd_prompt *level)
@@ -330,7 +319,38 @@ struct cmd_prompt *sh_up_prompt_level(void)
 
 
 extern int rl_line_buffer_len, rl_end;
-int funtest2(int cnt, int key)
+extern char *rl_display_prompt ;
+
+/*
+	the function must be calld
+	core know from which "struct cmd_prompt" start with.
+	and then call sh_enter_ex
+*/
+void sh_whereboot(struct cmd_prompt *cmdboot)
+{
+	_prompt_tree[0] = &cmdboot[0];
+	_prompt_index    = 0;	
+}
+static int _dk_listmatch(void);
+static int _dk_autocompletion(void);
+/*
+	bind default key process 
+	maybe after allow user change key map
+*/
+int def_keybind()
+{
+	rl_bind_key('?',_dk_listmatch);
+	rl_bind_key('\t',_dk_autocompletion);
+	return 0;
+}	
+
+
+/*
+	default key program process
+	press key '?'
+	list may be match string
+*/
+static int _dk_listmatch(void)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -346,7 +366,7 @@ int funtest2(int cnt, int key)
 	memcpy(pbuf, rl_line_buffer, len);
 
 
-	sh_detach_fmt(pbuf, len, cmd, &count);
+	sh_detach_fmt_ac(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
 	int ret;
@@ -363,6 +383,7 @@ int funtest2(int cnt, int key)
 
 	}
 	else if (ret == 2){
+
 		printf("\n\t<cr>        Enter \n");
 	}
 #ifdef MINISHELL_USE_MALLOC
@@ -372,7 +393,12 @@ int funtest2(int cnt, int key)
 	return 0;
 }	
 
-int autocompletion(int cnt, int key)
+/*
+	default key program process
+	press key 'tab'
+	auto completion string which match prefix string
+*/
+static int _dk_autocompletion(void)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -388,7 +414,7 @@ int autocompletion(int cnt, int key)
 	memcpy(pbuf, rl_line_buffer, len);
 
 
-	sh_detach_fmt(pbuf, len, cmd, &count);
+	sh_detach_fmt_ac(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
 	int ret;
@@ -480,7 +506,7 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2, void *p
 	struct cmd_prompt *pstart;
 	int find = 0;
 
-	// sh_detach_fmt(fmt,len,cmd,&count);
+	// sh_detach_fmt_ac(fmt,len,cmd,&count);
 	// char str1[] = "abcd";
 	// char str2[] = "defg";
 
@@ -492,8 +518,8 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2, void *p
 	depth.count = 0;
 	depth.seps = NULL;
 	// printf("[%x]", depth2->cmd +1);
-	// sh_detach_fmt2(fmt,len, &depth2);
-	sh_detach_fmt2(fmt,len, depth2);
+	// sh_detach_xx_fmt(fmt,len, &depth2);
+	sh_detach_xx_fmt(fmt,len, depth2);
 	if (depth2->count) {
 		pstart = _prompt_tree[_prompt_index];
 		while(pstart->name) {
@@ -557,6 +583,8 @@ int sh_enter_ex(struct sh_detach_depth *env, void *ptr)
 	char shell_prompt[256];
 	char *input = (char *)NULL;
 	struct sh_detach_depth *penv;
+
+	def_keybind();
 	sh_sort();
 	// sh_init();
 	memcpy(g_envLocal.host, "MiniShell\0", 10);
