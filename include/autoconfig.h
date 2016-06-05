@@ -18,5 +18,6 @@
 #define CONFIG_2440_CAMIF                                       1
 #define CONFIG_OV9650                                           1
 #define CONFIG_USE_MINISHELL                                    1
-
+#define CONFIG_MINISHELL_EX 1
+#define CONFIG_MINISHELL_READLINE 1
 #endif

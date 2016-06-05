@@ -1,1 +1,0 @@
-SRCS += shell/minishell_core.c 

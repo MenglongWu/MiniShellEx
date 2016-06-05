@@ -14,67 +14,97 @@
 # V0.1		2014-08-23
 #		2 demo makefile AppMakefile.mk and LibMakefile.mk
 # V0.2		2015-08-21
-#	- load file_list
-#	- load output
 
+# V1.0
+# - 2015-12-01,Menglong Wu,MenglongWoo@aliyun.com
+#	- script/listprj.mk
+#	- script/default/project.mk
+#	- script/default/listprj.mk
 
-
-
-#################################################################
-# load default project configure: script/project.mk
-ifeq (script/project.mk, $(wildcard script/project.mk))
-	include script/project.mk
-endif
-
+export TOP_DIR = $(realpath ./)
 
 #################################################################
-# CROSS_COMPILE		- While the cross tool link
-# ARCH				- Target platform
-ARCH=arm920t
-DEV=MCU
-ifeq ("$(ARCH)", "")
-	ARCH=x86
+# load common config
+ifeq ("$(file_common)", "")
+	ifeq ($(TOP_DIR)/script/common.mk, $(wildcard $(TOP_DIR)/script/common.mk))
+		file_common = $(TOP_DIR)/script/common.mk
+		include $(TOP_DIR)/script/common.mk
+	else
+		file_common = 
+	endif
+else
+	include $(common)
 endif
 
-ifeq ("$(ARCH)", "arm920t")
-	CROSS_COMPILE	=/opt/EmbedSky/crosstools_3.4.5_softfloat/gcc-3.4.5-glibc-2.3.6/arm-linux/bin/arm-linux-
-endif
-
-ifeq ("$(ARCH)", "armv7")
-	CROSS_COMPILE	=/opt/iTop-4412/4.3.2/bin/arm-linux-
-endif
-
-ifeq ("$(ARCH)", "i586")
-	CROSS_COMPILE	=i586-mingw32msvc-
-endif
-
-ifeq ("$(DEV)", "")
-	DEV=MCU
-endif
-
-ifeq ("$(DEV)", "M")
-	CFLAGS =-D_MANAGE
-endif
-
-
-#################################################################
-# select which file be complie,it edit in config_app_file.mk
-# Import all files,it edit in config_xxx_file_list.mk
 ifeq ("$(file_config)", "")
-	ifeq (config.mk, $(wildcard config.mk))
-		include config.mk
+	ifeq ($(TOP_DIR)/script/config.mk, $(wildcard $(TOP_DIR)/script/config.mk))
+		file_config = ./script/config.mk
+		include $(file_config)
+	else
+		file_config = ========== no such file ./script/config.mk
 	endif
 else
 	include $(file_config)
 endif
 
-ifeq ("$(file_list)", "")
-	ifeq (config_app_file_list.mk, $(wildcard config_app_file_list.mk))
-		include config_app_file_list.mk
-	endif
+
+#################################################################
+# load all project items
+# DP,ARG defined in listprj.mk
+include script/listprj.mk
+
+ifeq ("$($(DP)_arg)", "")
+	ARG=all
 else
-	include $(file_list)
+	ARG=$($(DP)_arg)
 endif
+
+#################################################################
+# load default project configure xxx/project.mk
+# load file list xxx/filelist.mk,SRCS-y defined in xxx/filelist.mk
+file_list =$($(DP))/filelist.mk
+file_prj  =$($(DP))/project.mk
+
+# checking
+ifeq ($(file_prj), $(wildcard $(file_prj)))
+	include $(file_prj)
+else
+$(warning  "file_prj undefined")
+	file_prj = 
+endif
+
+# checking
+ifeq ($(file_list), $(wildcard $(file_list)))
+	include $(file_list)
+else
+$(warning  "file_list undefined")
+	 file_list = 
+endif
+
+
+# checking
+ifeq ("$(SRCS-y)", "")
+$(warning  "SRCS-y is empty")
+endif
+
+
+
+
+
+#################################################################
+# select which file be complie,it edit in config_app_file.mk
+# Import all files,it edit in config_xxx_file_list.mk
+
+
+ifeq ("$(file_lds)", "")
+	ifeq ($(TOP_DIR)/script/default/boot.lds, $(wildcard $(TOP_DIR)/script/default/boot.lds))
+		file_lds = $(TOP_DIR)/script/default/boot.lds
+		# include $(file_lds)
+	else
+		file_lds = ========== no such file ./script/default/boot.lds 
+	endif	
+endif
+
 
 #################################################################
 OBJS = 	$(patsubst %.S,%.o,\
@@ -83,15 +113,7 @@ OBJS = 	$(patsubst %.S,%.o,\
 
 #################################################################
 # Output files name and directory
-# load script/output.mk include OUTPUT_ELF,OUTPUT_DIS and so on
 # 
-ifeq ("$(output)", "")
-	ifeq (script/output.mk , $(wildcard script/output.mk ))
-		include script/output.mk
-	endif
-else
-	include $(output)
-endif
 
 ifeq ("$(OUTPUT_ELF)", "")
 	OUTPUT_ELF	= download.elf
@@ -112,14 +134,14 @@ ifeq ("$(OUTPUT_DIR)", "")
 	OUTPUT_DIR	= release
 endif
 
-MAKE_DIR	+= include 
+MAKE_DIR	+= include doxygen
 
 
 
 
 #################################################################
 # macro NOWTIME "yyyy-mm-dd_HH:MM:SS"
-BUILD_DATE="$(shell date "+%Y-%m-%d_%H:%M:%S")"
+NOWTIME="$(shell date "+%Y-%m-%d_%H:%M:%S")"
 
 #################################################################
 # INCLUDE_DIR	- Where will be search *.h file
@@ -128,58 +150,21 @@ BUILD_DATE="$(shell date "+%Y-%m-%d_%H:%M:%S")"
 #-Wl,-rpath=./:./lib/
 
 #when app.elf run will select *.so/a from $(PATH) -> ./ -> ./lib/
-INCLUDE_DIR	+= 
-LFLAGS		+= 
-LIB_DIR 	+= 
-CFLAGS      += -DBUILD_DATE=\"$(BUILD_DATE)\"  -DPRJ_VERSION=\"$(PRJ_VERSION)\" -DPRJ_NAME=\"$(PRJ_NAME)\"
-
-# ifeq ("$(ARCH)", "x86")
-# 	INCLUDE_DIR	+= 
-# 	LFLAGS		+= -ltermcap  
-# 	# -lefence 
-# 	LIB_DIR 	+= -L/usr/local/install/lib
-# 	CFLAGS		+= -DTARGET_X86
-# endif
-
-# ifeq ("$(ARCH)", "armv7")
-# 	INCLUDE_DIR	+= -I/usr/4412/install/include
-# 	LFLAGS		+= 
-# 	LIB_DIR 	+= -L/usr/4412/install/lib
-# 	CFLAGS		+= -DTARGET_ARMV7
-# endif
+# INCLUDE_DIR += 
+# LFLAGS	    += 
+# LIB_DIR     += 
+CFLAGS      += -DBUILD_DATE=\"$(NOWTIME)\"		\
+		-DPRJ_VERSION=$(PRJ_VERSION)	\
+		-DPRJ_PATCHLEVEL=$(PRJ_PATCHLEVEL)	\
+		-DPRJ_SUBLEVEL=$(PRJ_SUBLEVEL)	\
+		-DPRJ_NAME=\"$(PRJ_NAME)\"
 
 
-# ifeq ("$(ARCH)", "arm920t")
-# 	INCLUDE_DIR	+= -I/usr/arm920t/install/include
-# 	LFLAGS		+= 
-# 	LIB_DIR 	+= -L/usr/arm920t/install/lib
-# 	CFLAGS		+= -DTARGET_ARM920T
-# endif
-
-
-# ifeq ("$(ARCH)", "i586")
-# 	INCLUDE_DIR	+= -I/usr/win32/install/include
-# 	LFLAGS		+= 
-# 	LIB_DIR 	+= -L/usr/win32/install/lib
-# 	CFLAGS		+= 
-# endif
 #################################################################
-
-
-
-ifeq ("$(OUTPUT_DIR)", "")
-	OUTPUT_DIR=debug
-endif
-
-ifeq ("$(CROSS_COMPILE)", "")
-else
-endif
-
-
 GCC_G++ = gcc
 CC 	= $(CROSS_COMPILE)$(GCC_G++)
-CPP	= $(CROSS_COMPILE)g++
 LD 	= $(CROSS_COMPILE)ld
+AR  = $(CROSS_COMPILE)ar
 OBJDUMP = $(CROSS_COMPILE)objdump
 OBJCOPY = $(CROSS_COMPILE)objcopy
 
@@ -187,13 +172,13 @@ OBJCOPY = $(CROSS_COMPILE)objcopy
 # CFLAGS		- Compile general option
 # CC_FLAGS		- Compile only for *.c file option
 # CS_FLAGS		- Compile only for *.S file option
-# CFLAGS		+= -g  	 -Wall -static -rdynamic -D_UNUSE_QT_ -fshort-wchar 
-ifeq ("$(GCC_G++)","gcc") # 只有gcc编译器才使用该选项，g++无此选项
+CFLAGS		+= -g  	 -Wall  -rdynamic
+ifeq ("$(GCC_G++)","gcc") # only compile gcc use -std=gnu99 option
 	CC_FLAGS    = -std=gnu99
 else
 	CC_FLAGS    = 
 endif
-CS_FLAGS    = 
+
 
 
 CC_FLAGS   += $(CFLAGS)
@@ -206,77 +191,131 @@ else
 endif
 
 
-all:$(load_lds)
+#################################################################
+# def target beyond DP,ARG
+def:$(ARG)
 
-configure: init_dir
-	@mkheader config.mk include/autoconfig.h $(PRJ_NAME)
+# do something for all target
+include script/allprj.mk
 
+# list all project
+lp:
+	@cat script/listprj.mk | grep "=script/.\|arg=" | grep -v "#"
+	@echo DP=$(DP)
+ep:
+	vi -o $(file_prj) $(file_list)
 #################################################################
 # 
-load_lds-n:$(OUTPUT_DIR) $(OBJS)
-	@echo 
-	@echo "    " create $(OUTPUT_DIR)/$(OUTPUT_ELF)
-	@$(CC) -o $(OUTPUT_DIR)/$(OUTPUT_ELF) $(OBJS) $(LIB_DIR) $(LFLAGS)
-
-	@echo create $(OUTPUT_DIR)/$(OUTPUT_DIS)
-	@$(OBJDUMP) -S $(OUTPUT_DIR)/$(OUTPUT_ELF) > $(OUTPUT_DIR)/$(OUTPUT_DIS)
-
-
-load_lds-y:$(OUTPUT_DIR) $(OBJS)
-	@echo
-	@echo "    " create $(OUTPUT_DIR)/$(OUTPUT_ELF)
-	@$(LD) -Tboot.lds $(OBJS) -o $(OUTPUT_DIR)/$(OUTPUT_ELF) $(LFLAGS) $(LIB_DIR)  
-
-	@echo "    " create $(OUTPUT_DIR)/$(OUTPUT_BIN)
-	@$(OBJCOPY) -O binary -S $(OUTPUT_DIR)/$(OUTPUT_ELF) $(OUTPUT_DIR)/$(OUTPUT_BIN)
-
-	@echo "    " create $(OUTPUT_DIR)/$(OUTPUT_DIS)
-	@$(OBJDUMP) -S $(OUTPUT_DIR)/$(OUTPUT_ELF) > $(OUTPUT_DIR)/$(OUTPUT_DIS)
+all:echo-arch elf bin dis
 
 #################################################################
+# create autoconfig.h and directory
+configure: init_dir
+	echo $(file_config) include/autoconfig.h $(PRJ_NAME)
+	@mkheader $(file_config) include/autoconfig.h $(PRJ_NAME)
+
+# 
+dis:echo-arch elf
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_DIS)"
+	@$(OBJDUMP) -S $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) > $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_DIS)	
+
+# create bin file, for system on chip without operating system
+bin:echo-arch elf
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_BIN)"
+	@$(OBJCOPY) -O binary -S $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_BIN)
+#################################################################
+# it's a ELF application program file on linux,*.lds is auto loaded 
+# by system from default path
+elf:echo-arch $(load_lds)
+
+load_lds-n:$(OUTPUT_DIR)-$(ARCH) $(OBJS)
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF)"
+	@$(CC) -o $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) $(OBJS) $(LIB_DIR) $(LFLAGS)
+
+# it's a bootloader bin file,user have to select *.lds file by your self
+# default file_lds = boot.lds
+load_lds-y:$(OUTPUT_DIR)-$(ARCH) $(OBJS)
+
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF)"
+	@$(LD) -T$(file_lds) $(OBJS) -o $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) $(LFLAGS) $(LIB_DIR)  
+#################################################################
+.PHONY: mlib
+mlib:echo-arch  $(OUTPUT_DIR)-$(ARCH) $(OBJS)
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_SO)"
+	@$(CC) -shared -fPIC -o $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_SO) $(OBJS)
+	@echo "    create     $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_A)"
+	@$(AR) rcs $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_A) $(OBJS)
+#################################################################
+echo-arch:
+	@echo "    ARCH       [$(ARCH)]"
 %.o:%.c
-	@echo "    " compile $^
+	@echo "    compile    $^"
 	@$(CC) -o $@ -c $^ $(CC_FLAGS) $(INCLUDE_DIR)
 %.o:%.cpp
-	@echo "    " compile $^
+	@echo "    compile    $^"
 	@$(CC) -o $@ -c $^ $(CC_FLAGS) $(INCLUDE_DIR) 
 %.o:%.S
-	@echo "    " compile $^
+	@echo "    compile    $^"
 	@$(CC) -o $@ -c $^ $(CS_FLAGS) $(INCLUDE_DIR)
 
 
-# make directory
-$(OUTPUT_DIR):
-	mkdir $(OUTPUT_DIR)
 
-init_dir:$(MAKE_DIR)
+#################################################################
+# make directory
+$(OUTPUT_DIR)-$(ARCH):
+	@mkdir $(OUTPUT_DIR)-$(ARCH)
+
+# .PHONY:$(MAKE_DIR)
+init_dir:$(CHECK_TARGET) $(MAKE_DIR)
+
+CHECK_TARGET:
+ifneq ("$(ARCH)","$(filter $(SUPPORT_TARGET), $(ARCH))") 
+$(error  "unsupport target [$(ARCH)]")
+endif
 
 $(MAKE_DIR):
-	mkdir $@ 
+	@mkdir $@
 
 
-.PHONY: clean disclean
+
+#################################################################
+.PHONY: clean
 clean:
-	@-rm $(OBJS)  \
-		$(OUTPUT_DIR)/$(OUTPUT_DIS) \
-		$(OUTPUT_DIR)/$(OUTPUT_ELF) \
-		$(OUTPUT_DIR)/$(OUTPUT_BIN) \
-		$(OUTPUT_DIR)/$(OUTPUT_SO) \
-		$(OUTPUT_DIR)/$(OUTPUT_A)
+	@-rm -f $(OBJS)  \
+		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_DIS) \
+		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) \
+		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_BIN) \
+		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_SO) \
+		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_A)
 	@-rm -f core
 
+.PHONY: disclean
+disclean:clean
+	@rmdir $(OUTPUT_DIR)-$(ARCH) --ignore
+#################################################################
+
+
 run:
-	./$(OUTPUT_DIR)/$(OUTPUT_ELF)
+	./$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF)
 
 gdb:
-	gdb ./$(OUTPUT_DIR)/$(OUTPUT_ELF)
+	gdb ./$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF)
 gdb-core:
-	gdb ./$(OUTPUT_DIR)/$(OUTPUT_ELF) core
+	gdb ./$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) core
 
 
 print_env:
-	@echo PRJ_VERSION = $(PRJ_VERSION)
-	@echo PRJ_NAME = $(PRJ_NAME)
+	@echo =========================================================
+
+	@echo PRJ_VERSION "  "= $(PRJ_VERSION)
+	@echo PRJ_NAME "     "= $(PRJ_NAME)
+
+	@echo 
+	@echo file_common "  "= $(file_common)
+	@echo file_prj "     "= $(file_prj)
+	@echo file_config "  "= $(file_config)
+	@echo file_list "    "= $(file_list)
+	@echo file_lds "     "= $(file_lds)
 
 	@echo 
 	@echo CROSS_COMPILE = $(CROSS_COMPILE)
@@ -294,26 +333,48 @@ print_env:
 	@echo OUTPUT_DIR "   "= $(OUTPUT_DIR)
 
 	@echo 
-	@echo INCLUDE_DIR "  " = $(INCLUDE_DIR)
-	@echo LFLAGS "  " = $(LFLAGS)
-	@echo LIB_DIR "  " = $(LIB_DIR)
-	@echo CFLAGS "  " = $(CFLAGS)
+	@echo INCLUDE_DIR " " = $(INCLUDE_DIR)
+	@echo LFLAGS "      " = $(LFLAGS)
+	@echo LIB_DIR "     " = $(LIB_DIR)
+	@echo CFLAGS "      " = $(CFLAGS)
 
-	@echo SRCS-y = $(SRCS-y)
+	@echo $(SRCS-y)
+help:
+	@echo ======================== Makefile help ========================
+	@echo "    "configure"    "make autoconfig.h from config file default config.mk
+	@echo "    "all"          "create *.elf,*.bin
+
+	@echo "    "clean"        "clean output file depend on *.o and OUTPUT_xxx\(OUTPUT_ELF and so on\)
+	@echo "    "lp"           "list project
+	@echo "    "library"      "create *.so, *.a
+	@echo "    "print_env"    "display environment,only for debug Makefile
+	@echo "    "run"          "run *elf 
+	@echo "    "gdb"          "gdb debug
+	@echo "    "gdb-core"     "gdb debug and load core
+	@echo 
+	@echo "Environment"
+	@echo "    "CONFIG_XXX"   "select module be compiled,define on config.mk,
+	@echo "                   "CONFIG_MODULE = y
+	@echo "                   "CONFIG_ENV      = "abc"
+	@echo "    "SRCS-y"       "select file be compiled
+	@echo "                   "SRCS-y += src/main.c src/foo.c
+	@echo "                   "SRCS-\(CONFIG_MODULE\) += mod/module.c
 # user define
-toolclean:
-	@-rm  tools/*.elf                \
-		  tools/*.o                
-
-
-rmoutput:$(OUTPUT_DIR)
-	@-rm -rf $(OUTPUT_DIR)
 
 rmdb:
-	@-rm /etc/tmsxx.db
+	@-rm /etc/xx.db
 sqlite3:
-	sqlite3 /etc/tmsxx.db
+	sqlite3 /etc/xx.db
 
+#################################################################
+# copy/install output file to other directory
+copy:copy_$(ARG)
 
-copy:
-	cp ./$(OUTPUT_DIR)/$(OUTPUT_ELF) /usr/armdebug/tms4412.elf
+copy_elf:copy_all
+copy_all:
+	cp $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_ELF) /usr/armdebug/
+copy_bin:
+	cp $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_BIN) /usr/armdebug/
+copy_mlib:
+	cp $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_SO) /usr/armdebug
+	cp $(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_A) /usr/armdebug
