@@ -20,11 +20,17 @@ extern "C" {
 #endif
 
 
+#ifdef CONFIG_MINISHELL_READLINE
+	#define echo_printf printf
 
+#else
+	#define echo_printf printk
+#endif
+	
 
 #if !defined(CMD_ARRAY) && !defined(CMD_SECTION) && !defined(CMD_LDS)
-	#define CMD_LDS
-	// #define CMD_ARRAY
+	// #define CMD_LDS
+	#define CMD_ARRAY
 	// #define CMD_SECTION
 #endif
 
@@ -42,6 +48,7 @@ extern "C" {
 
 struct cmd_prompt {
 	struct cmd_prompt	*next;
+	int (*fun)(void *ptr, int argc, char **argv);
 	char *name;
 	char *help;
 	int type;
@@ -63,7 +70,13 @@ struct env {
 	char path[SHELL_PATH_LEN];
 };
 
-
+struct sh_detach_depth
+{
+	char **cmd;
+	int len;
+	int count;
+	char *seps;
+};
 
 
 
@@ -75,12 +88,21 @@ extern struct env g_envLocal;
 extern int do_help(int argc, char **argv);
 extern int do_null(int argc, char **argv);
 extern int do_hostname(int argc, char **argv);
+extern void sh_cmdboot(struct cmd_table *boot);
 extern int sh_enter();
+extern int sh_enter_ex(struct sh_detach_depth *env, void *ptr);
 extern void sh_editpath(char *path);
 extern void sh_analyse (char *fmt, long len);
 extern void sh_editpath(char *path);
 extern void sh_sort();
 extern void sh_sort_ex(struct cmd_prompt *cmdlist, int count);
+
+extern int do_undo_ex(void *ptr, int argc, char **argv);
+
+extern struct cmd_prompt *sh_down_prompt_level(
+	struct cmd_prompt *level);
+extern struct cmd_prompt *sh_up_prompt_level(void);
+extern void sh_whereboot(struct cmd_prompt *cmdboot);
 
 #ifdef CMD_SECTION
 	extern volatile int __wcmd_start;
@@ -88,9 +110,19 @@ extern void sh_sort_ex(struct cmd_prompt *cmdlist, int count);
 #endif
 
 
-
-
-
+#define SH_FUN_NULL do_undo_ex
+// #define PROMPT_NODE(a,b,c,d) {(char*)(a), (char*)(b), (struct cmd_prompt	*)(c), (int)(d)}
+#ifndef NULL
+#define NULL ((void*)0)
+#endif
+#define PROMPT_NODE(a,f,b,c,d) \
+{ \
+	.next = (struct cmd_prompt	*)(a), \
+	.fun  = (int (*)(void *, int , char **))f, \
+	.name = (char*)(b), \
+	.help = (char*)(c), \
+	.type = (int)(d), \
+}
 
 
 // W_BOOT_CMD do what
@@ -109,8 +141,10 @@ extern void sh_sort_ex(struct cmd_prompt *cmdlist, int count);
 
 //MINISHELL_START\MINISHELL_END
 #ifdef CMD_ARRAY
-	#define MINISHELL_START(p) (p = &cmd_tbl_list[0])
-	#define MINISHELL_END(p) (p = &cmd_tbl_list[0] + sizeof(cmd_tbl_list)/sizeof(struct cmd_table) - 1)
+	// #define MINISHELL_START(p) (p = &cmd_tbl_list[0])
+	// #define MINISHELL_END(p) (p = &cmd_tbl_list[0] + sizeof(cmd_tbl_list)/sizeof(struct cmd_table) - 1)
+	#define MINISHELL_START(p) (p = _ptab_list)
+	#define MINISHELL_END(p) (p = _ptab_list_end)
 #endif
 
 
