@@ -10,9 +10,10 @@
 // #  include "history.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/rltypedefs.h>
 const char _seps[] = " ,\t\n";
 
-
+// #define MINISHELL_DBG
 int do_undo_ex(void *ptr, int argc, char **argv)
 {
 	return 0;
@@ -22,7 +23,10 @@ int do_undo_ex(void *ptr, int argc, char **argv)
 // {
 
 // }
-void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
+/*
+	detach string and auto completion
+*/
+void sh_detach_fmt_ac (char *fmt,long len, char **cmd, int *count)
 {
 	// char *cmd[256],
 	char *token = NULL;	
@@ -41,7 +45,10 @@ void sh_detach_fmt (char *fmt,long len, char **cmd, int *count)
 	*count = index;
 }
 
-void sh_detach_fmt2 (char *fmt,long len, struct sh_detach_depth *depth)
+/*
+	忘记下面的代码是用来调试上面东西的了
+*/
+void sh_detach_xx_fmt (char *fmt,long len, struct sh_detach_depth *depth)
 {
 	// char *cmd[256],
 	char *token = NULL;	
@@ -209,11 +216,15 @@ void sh_display_match(struct cmd_prompt *pprompt, char *text)
 	while( ptprompt->name ) {
 		ret = memcmp(ptprompt->name, text, len);
 		if (ret == 0) {
+#ifdef MINISHELL_DBG
 			printf("ret %d %s\n",ret, ptprompt->name);
+#else
+			printf("%s\n",ptprompt->name);
+#endif
 		}
 		ptprompt++;
 	}
-	return 0;
+	// return 0;
 }
 
 // start end返回从start到end需要插入的字符串
@@ -221,18 +232,26 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 	int index, int *start, int *end)
 {
 	struct cmd_prompt *ptprompt, *ptprompt_next;
-	int len, ret;
+	int len;
 
 	ptprompt = pprompt + index;
 	ptprompt_next = pprompt + index + 1;
 	len = strlen(text);
+#ifdef MINISHELL_DBG
 	printf("\n");
-	int i = 0;
+#endif
+	// int i = 0;
+#ifdef MINISHELL_DBG	
 	printf("next  %s \n", ptprompt->name);
+#endif
 	char *ps,*ps_next;
 	ps = ptprompt->name;
 	while(*ps == *text) {
-		printf("%c %c", *ps++, *text++);
+#ifdef MINISHELL_DBG
+		printf("%c %c", *ps, *text);
+#endif
+		ps++;
+		text++;
 	}
 
 	*start = ps - ptprompt->name;
@@ -244,10 +263,16 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 
 
 	while(*ps == *ps_next) {
+#ifdef MINISHELL_DBG
 		printf("%c %c", *ps++, *ps_next++);
+#endif
+		ps++;
+		ps_next++;
 	}
 	*end = ps - ptprompt->name;
+#ifdef MINISHELL_DBG	
 	printf("sta %d end %d\n", *start, *end);
+#endif
 
 
 	return 0;
@@ -262,22 +287,15 @@ void sh_list(char *text, int len, struct cmd_prompt *boot)
 struct cmd_prompt *_prompt_tree[PROMPT_DEPTH];
 int         _prompt_index = 0;
 
-extern struct cmd_prompt cmd_boot[];
+#ifdef AUTO_BUILD
+	extern struct cmd_prompt boot_boot1[];
+#else
+	extern struct cmd_prompt cmd_boot[];
+#endif
 
-extern char *rl_display_prompt ;
-int funtest2(int a, int b);
-int autocompletion(int a, int b);
-int funtest(int a, int b)
-{
-	_prompt_tree[0] = &cmd_boot[0];
-	_prompt_index    = 0;
-	
-	printf ("a = %d b = %d\n", a, b);
-	// printf("[%s]", rl_display_prompt);
-	rl_bind_key('?',funtest2);
-	rl_bind_key('\t',autocompletion);
-	return 0;
-}	
+
+
+
 
 struct cmd_prompt *sh_down_prompt_level(
 	struct cmd_prompt *level)
@@ -302,7 +320,44 @@ struct cmd_prompt *sh_up_prompt_level(void)
 
 
 extern int rl_line_buffer_len, rl_end;
-int funtest2(int cnt, int key)
+extern char *rl_display_prompt ;
+
+/*
+	the function must be calld
+	core know from which "struct cmd_prompt" start with.
+	and then call sh_enter_ex
+*/
+void sh_whereboot(struct cmd_prompt *cmdboot)
+{
+	_prompt_tree[0] = &cmdboot[0];
+	_prompt_index    = 0;	
+}
+#if 0
+// this compile have warning !!!
+static int _dk_listmatch(int key, rl_command_func_t function);
+static int _dk_autocompletion(int key, rl_command_func_t function);
+#endif
+
+static int _dk_listmatch(int key, int function);
+static int _dk_autocompletion(int key, int function);
+/*
+	bind default key process 
+	maybe after allow user change key map
+*/
+int def_keybind()
+{
+	rl_bind_key('?',_dk_listmatch);
+	rl_bind_key('\t',_dk_autocompletion);
+	return 0;
+}	
+
+
+/*
+	default key program process
+	press key '?'
+	list may be match string
+*/
+static int _dk_listmatch(int key, int function)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -318,11 +373,14 @@ int funtest2(int cnt, int key)
 	memcpy(pbuf, rl_line_buffer, len);
 
 
-	sh_detach_fmt(pbuf, len, cmd, &count);
+	sh_detach_fmt_ac(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
 	int ret;
+#ifdef MINISHELL_DBG
 	printf("index %d %d %d\n", _prompt_index, count, len);
+#endif
+
 	ret = searchboot(count, cmd, _prompt_tree[_prompt_index], &plist);
 
 	// printf("ret = %d\n", ret);
@@ -332,7 +390,8 @@ int funtest2(int cnt, int key)
 
 	}
 	else if (ret == 2){
-		printf("\t<cr>        Enter \n");
+
+		printf("\n\t<cr>        Enter \n");
 	}
 #ifdef MINISHELL_USE_MALLOC
 	free(pbuf);
@@ -341,7 +400,12 @@ int funtest2(int cnt, int key)
 	return 0;
 }	
 
-int autocompletion(int cnt, int key)
+/*
+	default key program process
+	press key 'tab'
+	auto completion string which match prefix string
+*/
+static int _dk_autocompletion(int key, int function)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -357,22 +421,27 @@ int autocompletion(int cnt, int key)
 	memcpy(pbuf, rl_line_buffer, len);
 
 
-	sh_detach_fmt(pbuf, len, cmd, &count);
+	sh_detach_fmt_ac(pbuf, len, cmd, &count);
 	
 	struct cmd_prompt *plist;
 	int ret;
+#ifdef MINISHELL_DBG
 	printf("index %d %d %d\n", _prompt_index, count, len);
+#endif
 	ret = searchboot(count - 1, cmd, _prompt_tree[_prompt_index], &plist);
 
 	if (ret == 0 || ret == 1) {
 		// todo 自动填充
 		// sh_display_prompt(plist);
+#ifdef MINISHELL_DBG
 		printf("cmd %s %s\n", cmd[count - 1], plist->name);
+#endif
 
 		int index;
 		ret = sh_check_match(plist, cmd[count - 1], &index);
+#ifdef MINISHELL_DBG
 		printf("match count %d from %d\n", ret, index);
-
+#endif
 		int start, end;
 		
 		switch(ret) {
@@ -388,7 +457,9 @@ int autocompletion(int cnt, int key)
 			ptprompt = plist + index;
 			ps = ptprompt->name;
 			end = strlen(ps) + 1;
+#ifdef MINISHELL_DBG
 			printf("ps %s %d %d\n", ps, start, end );
+#endif
 			memcpy(strout,ps + start, end - start);
 			strout[end - start] = '\0';
 			printf("%s%s", rl_prompt, rl_line_buffer);
@@ -412,6 +483,7 @@ int autocompletion(int cnt, int key)
 			rl_insert_text(strout);
 
 			// printf(" auto after [%s]\n", rl_line_buffer);
+			printf("%s%s", rl_prompt, rl_line_buffer);
 			break;
 		default:
 			break;
@@ -429,7 +501,7 @@ int autocompletion(int cnt, int key)
 	// printf("%s%s", rl_prompt, rl_line_buffer);
 	return 0;
 }	
-void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
+void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2, void *ptr)
 {
 	//char (*cmd)[10];
 	char *cmd[256], *token = NULL;
@@ -441,7 +513,7 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 	struct cmd_prompt *pstart;
 	int find = 0;
 
-	// sh_detach_fmt(fmt,len,cmd,&count);
+	// sh_detach_fmt_ac(fmt,len,cmd,&count);
 	// char str1[] = "abcd";
 	// char str2[] = "defg";
 
@@ -453,8 +525,8 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 	depth.count = 0;
 	depth.seps = NULL;
 	// printf("[%x]", depth2->cmd +1);
-	// sh_detach_fmt2(fmt,len, &depth2);
-	sh_detach_fmt2(fmt,len, depth2);
+	// sh_detach_xx_fmt(fmt,len, &depth2);
+	sh_detach_xx_fmt(fmt,len, depth2);
 	if (depth2->count) {
 		pstart = _prompt_tree[_prompt_index];
 		while(pstart->name) {
@@ -467,11 +539,12 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 
 		if(find == 1) {
 			if (pstart->fun) {
-				for (int i = 0; i < depth2->count;i++) {
-					printf("%d %s \n", i, depth2->cmd[i]);
-				}
+				// for (int i = 0; i < depth2->count;i++) {
+				// 	printf("%d %s \n", i, depth2->cmd[i]);
+				// }
 				// pstart->fun(NULL, depth2->count, (char **)cmd);
-				pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
+				// pstart->fun(NULL, depth2->count, (char **)&depth2->cmd[0]);
+				pstart->fun(ptr, depth2->count, (char **)&depth2->cmd[0]);
 			}
 		}
 		else {
@@ -512,11 +585,13 @@ void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2)
 	}
 }
 
-int sh_enter_ex(struct sh_detach_depth *env)
+int sh_enter_ex(struct sh_detach_depth *env, void *ptr)
 {
 	char shell_prompt[256];
 	char *input = (char *)NULL;
 	struct sh_detach_depth *penv;
+
+	def_keybind();
 	sh_sort();
 	// sh_init();
 	memcpy(g_envLocal.host, "MiniShell\0", 10);
@@ -532,7 +607,7 @@ int sh_enter_ex(struct sh_detach_depth *env)
 		local.cmd = cmd;
 		local.len = 256;
 		local.count = 0;
-		local.seps = _seps;
+		local.seps = (char*)_seps;
 		local.cmd[1] = "abcd";
 		penv = &local;
 	}
@@ -552,7 +627,7 @@ int sh_enter_ex(struct sh_detach_depth *env)
 		}
 		if (*input != '\0') {
 			add_history(input);
-			sh_analyse_ex(input, strlen(input), penv);
+			sh_analyse_ex(input, strlen(input), penv, ptr);
 			// if(0 == strcmp(input, "quit")) {
 			// 	printf("\r\n");
 			// 	break;
