@@ -10,6 +10,7 @@
 // #  include "history.h"
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/rltypedefs.h>
 const char _seps[] = " ,\t\n";
 
 // #define MINISHELL_DBG
@@ -231,7 +232,7 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 	int index, int *start, int *end)
 {
 	struct cmd_prompt *ptprompt, *ptprompt_next;
-	int len, ret;
+	int len;
 
 	ptprompt = pprompt + index;
 	ptprompt_next = pprompt + index + 1;
@@ -239,7 +240,7 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 #ifdef MINISHELL_DBG
 	printf("\n");
 #endif
-	int i = 0;
+	// int i = 0;
 #ifdef MINISHELL_DBG	
 	printf("next  %s \n", ptprompt->name);
 #endif
@@ -331,8 +332,14 @@ void sh_whereboot(struct cmd_prompt *cmdboot)
 	_prompt_tree[0] = &cmdboot[0];
 	_prompt_index    = 0;	
 }
-static int _dk_listmatch(void);
-static int _dk_autocompletion(void);
+#if 0
+// this compile have warning !!!
+static int _dk_listmatch(int key, rl_command_func_t function);
+static int _dk_autocompletion(int key, rl_command_func_t function);
+#endif
+
+static int _dk_listmatch(int key, int function);
+static int _dk_autocompletion(int key, int function);
 /*
 	bind default key process 
 	maybe after allow user change key map
@@ -350,7 +357,7 @@ int def_keybind()
 	press key '?'
 	list may be match string
 */
-static int _dk_listmatch(void)
+static int _dk_listmatch(int key, int function)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -398,7 +405,7 @@ static int _dk_listmatch(void)
 	press key 'tab'
 	auto completion string which match prefix string
 */
-static int _dk_autocompletion(void)
+static int _dk_autocompletion(int key, int function)
 {
 	int len    = strlen(rl_line_buffer);
 #ifdef MINISHELL_USE_MALLOC
@@ -600,7 +607,7 @@ int sh_enter_ex(struct sh_detach_depth *env, void *ptr)
 		local.cmd = cmd;
 		local.len = 256;
 		local.count = 0;
-		local.seps = _seps;
+		local.seps = (char*)_seps;
 		local.cmd[1] = "abcd";
 		penv = &local;
 	}
