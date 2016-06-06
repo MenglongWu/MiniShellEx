@@ -11,6 +11,9 @@
 	pi5=script/test
 		pi5_arg=elf
 
+	pi6=script/libminishell
+		pi6_arg=mlib
+
 	pi2=script/prj_liba
 		pi2_arg=mlib
 
@@ -18,4 +21,4 @@
 		pi3_arg=mlib
 
 # default project item
-export DP=pi4
+export DP=pi6

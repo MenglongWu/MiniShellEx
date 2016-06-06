@@ -1,6 +1,6 @@
 
 PRJ_VERSION = "1.0.0"
-PRJ_NAME = "Hello-KuGo_Menglong"
+PRJ_NAME = "testbuild"
 
 
 # load_lds = y
