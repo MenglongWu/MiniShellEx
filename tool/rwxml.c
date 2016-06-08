@@ -33,14 +33,14 @@ static struct item * _xmlloaditem(xmlNodePtr proot)
 				if (!xmlStrcmp(attrPtr->name,  BAD_CAST "name")) {
 					xmlChar* szAttr = xmlGetProp(proot,  BAD_CAST  "name");
 
-					new_node->name = (char*)malloc(strlen((char*)szAttr));
+					new_node->name = (char*)malloc(strlen((char*)szAttr) + 1);
 					strcpy(new_node->name, (char*)szAttr);
 					xmlFree(szAttr);			
 				}
 
 				if (!xmlStrcmp(attrPtr->name,  BAD_CAST "boot")) {
 					xmlChar* szAttr = xmlGetProp(proot,  BAD_CAST  "boot");
-					new_node->boot = (char*)malloc(strlen((char*)szAttr));
+					new_node->boot = (char*)malloc(strlen((char*)szAttr) + 1);
 					strcpy(new_node->boot, (char*)szAttr);
 
 
@@ -53,7 +53,7 @@ static struct item * _xmlloaditem(xmlNodePtr proot)
 					printf("get alias = %s\n", szAttr);
 #endif
 
-					new_node->alias = (char*)malloc(strlen((char*)szAttr));
+					new_node->alias = (char*)malloc(strlen((char*)szAttr) + 1);
 					strcpy(new_node->alias, (char*)szAttr);
 
 					xmlFree(szAttr);			
@@ -65,7 +65,7 @@ static struct item * _xmlloaditem(xmlNodePtr proot)
 					printf("get help = %s\n", (char*)szAttr);
 #endif
 
-					new_node->help = (char*)malloc(strlen((char*)szAttr));
+					new_node->help = (char*)malloc(strlen((char*)szAttr) + 1);
 					strcpy(new_node->help, (char*)szAttr);
 
 					xmlFree(szAttr);			
@@ -102,22 +102,16 @@ struct group * xmlloadgroup(xmlNodePtr proot)
 			bzero(new_node, sizeof(struct group));
 			INIT_LIST_HEAD(&new_node->next);
 			list_add_tail(&new_node->next, &phead->next);
-
-
 			xmlAttrPtr attrPtr = proot->properties;
-
 			if (!xmlStrcmp(attrPtr->name,  BAD_CAST "name")) {
 				xmlChar* szAttr = xmlGetProp(proot,  BAD_CAST  "name");
-				new_node->name = (char*)malloc(strlen((char*)szAttr));
+				new_node->name = (char*)malloc(strlen((char*)szAttr) + 1);
 				strcpy(new_node->name, (char*)szAttr);
-
 				xmlFree(szAttr);
 				new_node->item_first= _xmlloaditem(proot->xmlChildrenNode);
 			}
-
 			attrPtr = attrPtr->next;
 		}
-
 		proot = proot->next;
 	}
 	return phead;
@@ -149,7 +143,6 @@ struct group *xmlloadconfig(char *name)
 
 	pcur = proot->xmlChildrenNode;
 
-	
 	
 	pret = xmlloadgroup(pcur);
 _error:;
