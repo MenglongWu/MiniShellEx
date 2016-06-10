@@ -193,6 +193,7 @@ _FindSecend:;
 	*index = (ptprompt - pprompt);
 	ptprompt++;// 移动到下一个
 	while( ptprompt->name ) {
+		
 		ret = memcmp(ptprompt->name, text, len);
 		if (ret == 0) {
 			return 2;
@@ -386,6 +387,7 @@ static int _dk_listmatch(int key, int function)
 	// printf("ret = %d\n", ret);
 	if (ret == 0 || ret == 1) {
 		// sh_display_prompt(plist);
+		printf("\n");
 		sh_display_prompt(plist);
 
 	}
