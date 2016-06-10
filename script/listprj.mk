@@ -21,4 +21,4 @@
 		pi3_arg=mlib
 
 # default project item
-export DP=pi6
+export DP=pi1

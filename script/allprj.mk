@@ -9,7 +9,7 @@ allp:
 	$(MAKE) DP=pi4 --no-print-directory
 	$(MAKE) DP=pi6 --no-print-directory
 # $(MAKE) DP=pi5 --no-print-directory
-	$(MAKE) allstrip
+# $(MAKE) allstrip
 	
 
 # clean all project output

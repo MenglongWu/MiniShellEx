@@ -23,8 +23,8 @@ INCLUDE_DIR    = -I./usr/include  \
 				-I./shell \
 				-I/usr/local/install/include
 
-LFLAGS    = -lreadline -lhistory -ltermcap
+LFLAGS    += -lreadline -lhistory -ltermcap -lminishell-ex
  # -lefence -lpthread
-LIB_DIR   = -L/usr/local/install/lib
+LIB_DIR   += -L/usr/local/install/lib 
 CFLAGS    = -g 
 
