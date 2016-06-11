@@ -14,6 +14,9 @@ int main(int argc, char **argv)
 	depth.seps = " \t";
 
 
+	
+	char strout[100] = "interface fast 1";
+	sh_analyse_ex(strout, 20, &depth, NULL);
 	sh_enter_ex(&depth, NULL);
 	return 0;
 }

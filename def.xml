@@ -3,36 +3,45 @@
 <bookstore>
 
 <group name="root" abc="sd">
-<item name="show " boot="show" help="show something"></item>
-<item name="interface " boot="interface" help="enter interface"></item>
-<item name="ip " boot="ip" help="enter interface"></item>
-<item name="vlan " boot="vlan" help="config vlan"></item>
-<item name="Hostname " boot="" help="config vlan"></item>
+<item name="show" boot="show" help="show something"></item>
+<item name="interface" boot="interface" help="enter interface"></item>
+<item name="ip" boot="ip" help="enter interface"></item>
+<item name="vlan" boot="vlan" help="config vlan"></item>
+<item name="hostname" boot="" help="config vlan"></item>
 </group>
 
 
 
 <group name="show">
-<item name="show_run "  boot="" alias="run" help="help 2"></item>
-<item name="show_vlan "  boot=""  alias="vlan" help="help 3"></item>
+<item name="run"  boot="" alias="run" help="help 2"></item>
+<item name="vlan"  boot=""  alias="vlan" help="help 3"></item>
 </group>
 
 
 <group name="interface">
-<item name="fastetherne " boot="" help="help 2"></item>
-<item name="gethernet " boot=""  help="help 3"></item>
+<item name="fastethernet" boot="" help="help 2"></item>
+<item name="gethernet" boot=""  help="help 3"></item>
 </group>
 
 
 <group name="ip">
-<item name="router "  boot="" help="help 2"></item>
-<item name="address "  boot=""  help="help 3"></item>
+<item name="router"  boot="" help="help 2"></item>
+<item name="address"  boot=""  help="help 3"></item>
 </group>
 
 <group name="vlan">
-<item  name="1 " boot="" alias="c31"></item>
-<item name="2 "  boot="" alias="c321"></item>
-<item name="3 "  boot="" alias="c323"></item>
+<item  name="1" boot="" alias="c31"></item>
+<item name="2"  boot="" alias="c321"></item>
+<item name="3"  boot="" alias="c323"></item>
+</group>
+
+<group name="vlan">
+<item  name="2" boot="" alias="c31"></item>
+</group>
+
+
+<group name="root">
+<item name="3"  boot="" alias="c323"></item>
 </group>
 
 
