@@ -102,7 +102,7 @@ extern int do_undo_ex(void *ptr, int argc, char **argv);
 extern struct cmd_prompt *sh_down_prompt_level(
 	struct cmd_prompt *level);
 extern struct cmd_prompt *sh_up_prompt_level(void);
-extern void sh_whereboot(struct cmd_prompt *cmdboot);
+extern void sh_whereboot(struct cmd_prompt *boot_new);
 
 #ifdef CMD_SECTION
 	extern volatile int __wcmd_start;

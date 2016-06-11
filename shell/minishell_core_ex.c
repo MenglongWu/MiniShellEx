@@ -86,7 +86,6 @@ searchboot(
 	int len;
 
 	// boot = pprompt;
-
 	pstart = pprompt;
 	for (index = 0; index < argc; index++) {
 		find = 0;
@@ -174,7 +173,7 @@ int sh_check_match(struct cmd_prompt *pprompt, char *text,int  *index)
 
 	ptprompt = pprompt;
 	len = strlen(text);
-	printf("\n");
+	
 
 
 	// 找到第一个匹配的
@@ -284,32 +283,86 @@ void sh_list(char *text, int len, struct cmd_prompt *boot)
 
 }
 
+
+
+
+/*
+    _prompt_tree look as a stack structue.Stack len is PROMPT_DEPTH
+    
+       _prompt_tree
+       --------------
+       |PROMPT_DEPTH|
+       -------------- 
+       |            |     |--------------------->  boot_2
+       --------------     |                        |
+       |            |     |                        |-- cmd21
+       --------------     |                        |-- cmd22
+       |     3      |     |                        |-- cmd23
+       --------------     |                        |-- (null)
+       |     2      |     |    |-------> boot_1
+       --------------     |    |         |
+   |-> |     1      |  ---|    |         |-- cmd11
+   |   ------------ -          |         |-- cmd12
+   |   |     0      |  --------|         |-- cmd13
+   |   --------------                    |-- cmd14
+   |                                     |-- (null)
+   |   _prompt_index
+
+	_prompt_index determine the minishell core search where.
+	boot_n is a "struct cmd_prompt" array, the end with all null at the arrary last element.
+	The "name" element is the command name, such as "cmd11" "cmd12".
+	When user press Enter, the minishell will search curent boot_n array.
+	If found "name" match string "first word" then call "func" element else undo any thing.
+
+Example:
+	when _prompt_index = 0 input string :
+		1. "cmd11 opt1 opt2 opt3"
+		2. "cmd12 opt1 opt2 opt3"
+		3. "cmd21 opt1 opt2 opt3"
+
+		command "cmd11" and "cmd12" can be found,but "cmd21" can't be.
+
+	when _prompt_index = 1 input string the same
+
+		command "cmd21" can be found,but "cmd11" and "cmd12" can't be.
+ */
 #define PROMPT_DEPTH (16)
-struct cmd_prompt *_prompt_tree[PROMPT_DEPTH];
-int         _prompt_index = 0;
 
-#ifdef AUTO_BUILD
-	extern struct cmd_prompt boot_boot1[];
-#else
-	extern struct cmd_prompt cmd_boot[];
-#endif
+/*
+when call sh_whereboot() could be set _prompt_tree[0] point new "boot_new"
+boot_unuse only be use for avoid "Segmentation fault" and reminded developer call it.
+*/
+static struct cmd_prompt boot_unuse[] = {
+	PROMPT_NODE(NULL    ,      NULL,
+	(char *)"must call sh_whereboot()",
+	(char *)NULL,
+	(int)  NULL),
+};
+struct cmd_prompt *_prompt_tree[PROMPT_DEPTH] = {boot_unuse};
+int                _prompt_index = 0;
 
-
-
-
-
+/**
+ * @brief	push new boot in prompt
+ * @param	null
+ * @retval	not zero success
+ * @retval	NULL the stack is full
+ */
 struct cmd_prompt *sh_down_prompt_level(
-	struct cmd_prompt *level)
+    struct cmd_prompt *level)
 {
 	if (_prompt_index >= (PROMPT_DEPTH - 2) ) {
 		return NULL;
 	}
 	_prompt_tree[ ++_prompt_index ] = level;
-	return _prompt_tree[_prompt_index-1];
+	return _prompt_tree[_prompt_index - 1];
 }
 
-// struct cmd_prompt *gp_index;// =  _prompt_tree[0];
-
+/**
+ * @brief	pop the top boot level
+ * @param	null
+ * @retval	not zero success
+ * @retval	NULL the stack at the end
+ */
 struct cmd_prompt *sh_up_prompt_level(void)
 {
 	if (_prompt_index == 0 ) {
@@ -328,9 +381,9 @@ extern char *rl_display_prompt ;
 	core know from which "struct cmd_prompt" start with.
 	and then call sh_enter_ex
 */
-void sh_whereboot(struct cmd_prompt *cmdboot)
+void sh_whereboot(struct cmd_prompt *boot_new)
 {
-	_prompt_tree[0] = &cmdboot[0];
+	_prompt_tree[0] = &boot_new[0];
 	_prompt_index    = 0;	
 }
 #if 0
@@ -422,8 +475,28 @@ static int _dk_autocompletion(int key, int function)
 	// return 0;
 	memcpy(pbuf, rl_line_buffer, len);
 
+	/*
+	 split input string,such as input is "str1 str2 str3"
+	 cmd[0] = str1,  cmd[1] = str1,  cmd[2] = str3,
+	 count = 3
+	 max split beyond array cmd length
+	 */
+	int last = strlen(rl_line_buffer);
 
 	sh_detach_fmt_ac(pbuf, len, cmd, &count);
+
+	/*
+		if last word is end with ' '
+	*/
+	if (rl_line_buffer[last-1] == ' ') {
+		char lastlen, *p;
+
+		lastlen = strlen(cmd[count - 1]);
+		p = cmd[count-1];
+		p[lastlen ] = ' ';
+		p[lastlen +1] = '\0';
+	}
+
 	
 	struct cmd_prompt *plist;
 	int ret;
@@ -445,11 +518,12 @@ static int _dk_autocompletion(int key, int function)
 		printf("match count %d from %d\n", ret, index);
 #endif
 		int start, end;
-		
+
 		switch(ret) {
 		case 0:
 			break;
-		case 1:
+		case 1:// only 1 match
+			printf("\n");
 			sh_completion_head(plist, cmd[count - 1],
 				index, &start, &end);
 			{
@@ -466,11 +540,12 @@ static int _dk_autocompletion(int key, int function)
 			strout[end - start] = '\0';
 			printf("%s%s", rl_prompt, rl_line_buffer);
 			rl_insert_text(strout);
-			// printf(" auto after [%s]\n", rl_line_buffer);
+			// add a ' ' at the last word,make sure next press TAB don't match this
+			rl_insert_text(" ");					
 			}
 			break;
-		case 2:
-			
+		case 2:// more then 1 match
+			printf("\n");
 			sh_completion_head(plist, cmd[count - 1],
 				index, &start, &end);
 			char strout[24];
