@@ -3,10 +3,19 @@
 # create all project target with sequence
 
 .PHONY:allp
-allp:
-	$(MAKE) DP=pi1 --no-print-directory
+allp:pi1 pi4 pi5 pi6
 
+pi1:pi6
+	$(MAKE) DP=pi1 --no-print-directory
+pi5:pi4 auto
+	$(MAKE) DP=pi5 --no-print-directory
+
+pi4:pi6
 	$(MAKE) DP=pi4 --no-print-directory
+auto:
+	./release-$(ARCH)/msbuild
+
+pi6:
 	$(MAKE) DP=pi6 --no-print-directory
 # $(MAKE) DP=pi5 --no-print-directory
 # $(MAKE) allstrip
