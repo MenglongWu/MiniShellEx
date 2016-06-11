@@ -87,7 +87,7 @@ extern struct env g_envLocal;
 
 extern int do_help(int argc, char **argv);
 extern int do_null(int argc, char **argv);
-extern int do_hostname(int argc, char **argv);
+// extern int do_hostname(int argc, char **argv);
 extern void sh_cmdboot(struct cmd_table *boot);
 extern int sh_enter();
 extern int sh_enter_ex(struct sh_detach_depth *env, void *ptr);

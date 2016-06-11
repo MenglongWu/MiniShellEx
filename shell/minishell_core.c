@@ -146,7 +146,7 @@ W_BOOT_CMD(help, do_help, "shell help");
 /**
  * @brief	Mini Shell自带命令，修改命令提示符名
  */
-int do_hostname(int argc, char **argv)
+static int do_hostname(int argc, char **argv)
 {
 	if(argc != 2) {
 		puts("Usage:\n");
