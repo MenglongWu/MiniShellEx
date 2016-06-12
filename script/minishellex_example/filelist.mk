@@ -11,5 +11,5 @@
 # SRCS-y += shell/minishell_core.c
 # SRCS-y += shell/minishell_core_ex.c
 
-SRCS-y += src/switch.c
-SRCS-y += src/cmd_switch.c
+SRCS-y += example/switch.c
+SRCS-y += example/cmd_switch.c

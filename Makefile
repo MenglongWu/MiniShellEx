@@ -303,8 +303,8 @@ clean:
 		$(OUTPUT_DIR)-$(ARCH)/$(OUTPUT_A)
 	@-rm -f core
 
-.PHONY: disclean
-disclean:clean
+.PHONY: distclean
+distclean:clean
 	@rmdir $(OUTPUT_DIR)-$(ARCH) --ignore
 #################################################################
 
