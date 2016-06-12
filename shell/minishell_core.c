@@ -146,24 +146,24 @@ W_BOOT_CMD(help, do_help, "shell help");
 /**
  * @brief	Mini Shell自带命令，修改命令提示符名
  */
-int do_hostname(int argc, char **argv)
-{
-	if(argc != 2) {
-		puts("Usage:\n");
-		puts("\thostname <name>\n");
-	}
-	else {
-		int len;
-		len = strlen(argv[1]);
-		if (len > 10) {
-			len = 10;
-		}
-		memcpy(g_envLocal.host, argv[1], len);
-		g_envLocal.host[9] = '\0';
-	}
-	return 0;
-}
-W_BOOT_CMD(hostname, do_hostname, "set hostname");
+// static int do_hostname(int argc, char **argv)
+// {
+// 	if(argc != 2) {
+// 		puts("Usage:\n");
+// 		puts("\thostname <name>\n");
+// 	}
+// 	else {
+// 		int len;
+// 		len = strlen(argv[1]);
+// 		if (len > 10) {
+// 			len = 10;
+// 		}
+// 		memcpy(g_envLocal.host, argv[1], len);
+// 		g_envLocal.host[9] = '\0';
+// 	}
+// 	return 0;
+// }
+// W_BOOT_CMD(hostname, do_hostname, "set hostname");
 
 
 //*****************************************************************************

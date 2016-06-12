@@ -26,5 +26,5 @@ INCLUDE_DIR    = -I./usr/include  \
 LFLAGS    = -lreadline -lhistory -ltermcap
  # -lefence -lpthread
 LIB_DIR   = -L/usr/local/install/lib
-CFLAGS    = -O3
+CFLAGS    = -g
 

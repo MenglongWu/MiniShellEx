@@ -14,11 +14,11 @@
 	pi6=script/libminishell
 		pi6_arg=mlib
 
-	pi2=script/prj_liba
-		pi2_arg=mlib
+	# pi2=script/prj_liba
+	# 	pi2_arg=mlib
 
-	pi3=script/prj_libb
-		pi3_arg=mlib
+	# pi3=script/prj_libb
+	# 	pi3_arg=mlib
 
 # default project item
-export DP=pi6
+export DP=pi1

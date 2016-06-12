@@ -3,13 +3,22 @@
 # create all project target with sequence
 
 .PHONY:allp
-allp:
-	$(MAKE) DP=pi1 --no-print-directory
+allp:pi1 pi4 pi5 pi6
 
+pi1:pi6
+	$(MAKE) DP=pi1 --no-print-directory
+pi5:pi4 auto
+	$(MAKE) DP=pi5 --no-print-directory
+
+pi4:pi6
 	$(MAKE) DP=pi4 --no-print-directory
+auto:
+	./release-$(ARCH)/msbuild example/xml/switch.xml example/cmd_output.c
+
+pi6:
 	$(MAKE) DP=pi6 --no-print-directory
 # $(MAKE) DP=pi5 --no-print-directory
-	$(MAKE) allstrip
+# $(MAKE) allstrip
 	
 
 # clean all project output
@@ -23,7 +32,7 @@ allclean:
 	
 # remote all output file and empty directory which create by Makefile
 .PHONY:alldisclean
-alldisclean:
+alldistclean:
 	$(MAKE) DP=pi1 disclean --no-print-directory
 
 	$(MAKE) DP=pi4 disclean --no-print-directory
