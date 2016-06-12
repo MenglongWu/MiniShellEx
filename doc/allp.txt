@@ -1,0 +1,81 @@
+root@UbuntuServer:MiniShellEx$ make allp
+make DP=pi6 --no-print-directory
+    ARCH       [x86] 
+    create     lib-x86/libminishell-ex.so 
+    create     lib-x86/libminishell-ex.a 
+make DP=pi1 --no-print-directory
+    ARCH       [x86] 
+    compile    example/switch.c 
+    compile    example/cmd_switch.c 
+    create     release-x86/layer3switch.elf 
+make DP=pi4 --no-print-directory
+    ARCH       [x86] 
+    compile    tool/build.c 
+tool/build.c: In function ‘main’:
+tool/build.c:92: warning: passing argument 2 of ‘count_obj’ from incompatible pointer type
+tool/build.h:43: note: expected ‘long int *’ but argument is of type ‘int *’
+    compile    tool/rwxml.c 
+tool/rwxml.c: In function ‘_xmlwrite_group’:
+tool/rwxml.c:207: warning: initialization from incompatible pointer type
+tool/rwxml.c:208: warning: passing argument 1 of ‘xmlNewProp’ from incompatible pointer type
+./include/libxml/tree.h:790: note: expected ‘xmlNodePtr’ but argument is of type ‘xmlNsPtr’
+tool/rwxml.c:209: warning: passing argument 2 of ‘xmlAddChild’ from incompatible pointer type
+./include/libxml/tree.h:942: note: expected ‘xmlNodePtr’ but argument is of type ‘xmlNsPtr’
+tool/rwxml.c:214: warning: passing argument 2 of ‘xmlAddChild’ from incompatible pointer type
+./include/libxml/tree.h:942: note: expected ‘xmlNodePtr’ but argument is of type ‘xmlNsPtr’
+tool/rwxml.c:205: warning: unused variable ‘child_node’
+    compile    tool/build-structure.c 
+    compile    tool/wcfile.c 
+    create     release-x86/msbuild 
+./release-x86/msbuild example/xml/switch.xml example/cmd_output.c
+input file [example/cmd_output.c] have exit, over write?[y/n] :y
+root
+        show
+        interface
+        vlan
+        hostname
+        quit_system
+show
+        show_run
+        show_vlan
+        show_interface
+hostname
+        set_hostname
+interface
+        fastethernet
+        gigabitethernet
+fastethernet
+
+gigabitethernet
+
+vlan
+
+interface_root
+        arp
+        flow
+        ip
+        quit
+arp
+        detection
+        filter
+        max_learning_num
+detection
+        trust
+filter
+        on
+        off
+max_learning_num
+        unuse
+flow
+        on
+        off
+interface_ip
+        address
+        gw
+        mac
+ip_addr
+        unuse
+make DP=pi5 --no-print-directory
+    ARCH       [x86] 
+    compile    example/cmd_output.c 
+    create     release-x86/testbuild 

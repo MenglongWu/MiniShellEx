@@ -1,6 +1,6 @@
 
 PRJ_VERSION = "1.0.0"
-PRJ_NAME = "Hello-KuGo_Menglong"
+PRJ_NAME = "testbuild"
 
 
 # load_lds = y
@@ -23,7 +23,7 @@ INCLUDE_DIR    = -I./usr/include  \
 				-I./shell \
 				-I/usr/local/install/include
 
-LFLAGS    = -lreadline -lhistory -ltermcap -lxml2
+LFLAGS    = -lreadline -lhistory -ltermcap -lxml2 -lminishell-ex
  # -lefence -lpthread
 lIB_DIR   = -L/usr/local/install/lib
 CFLAGS    = -g  -DAUTO_BUILD
