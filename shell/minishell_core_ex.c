@@ -489,11 +489,12 @@ static int _dk_autocompletion(int key, int function)
 		if last word is end with ' '
 	*/
 	if (rl_line_buffer[last-1] == ' ') {
-		char lastlen, *p;
+		int lastlen;
+		char *p;
 
 		lastlen = strlen(cmd[count - 1]);
 		p = cmd[count-1];
-		p[lastlen ] = ' ';
+		p[lastlen] = ' ';
 		p[lastlen +1] = '\0';
 	}
 
@@ -577,7 +578,24 @@ static int _dk_autocompletion(int key, int function)
 #endif
 	// printf("%s%s", rl_prompt, rl_line_buffer);
 	return 0;
-}	
+}
+
+int sh_sethostname(char *name)
+{
+
+	int len;
+	len = strlen(name);
+	if (len > 10) {
+		len = 10;
+	}
+	memcpy(g_envLocal.host, name, len);
+	g_envLocal.host[len] = '\0';
+	g_envLocal.host[9] = '\0';
+	printf("g_envLocal.host %s\n", g_envLocal.host);
+	return 0;
+}
+
+
 void sh_analyse_ex (char *fmt, long len, struct sh_detach_depth *depth2, void *ptr)
 {
 	//char (*cmd)[10];
