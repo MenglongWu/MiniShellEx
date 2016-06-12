@@ -13,7 +13,7 @@ pi5:pi4 auto
 pi4:pi6
 	$(MAKE) DP=pi4 --no-print-directory
 auto:
-	./release-$(ARCH)/msbuild
+	./release-$(ARCH)/msbuild def.xml cmd_output.c
 
 pi6:
 	$(MAKE) DP=pi6 --no-print-directory

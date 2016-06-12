@@ -2,6 +2,14 @@
 #include <minishell_core.h>
 
 extern struct cmd_prompt boot_root[];
+
+struct user_ptr
+{
+	char *name;
+	int a;
+};
+
+
 int main(int argc, char **argv)
 {
 	sh_whereboot(boot_root);
@@ -13,10 +21,11 @@ int main(int argc, char **argv)
 	depth.len = 12;
 	depth.seps = " \t";
 
+	struct user_ptr upt;
+	upt.name = "This is a minishell_core demo, modeled layer 3 Switch\n";
+	upt.a = 1001;
 
 	
-	char strout[100] = "interface fast 1";
-	sh_analyse_ex(strout, 20, &depth, NULL);
-	sh_enter_ex(&depth, NULL);
+	sh_enter_ex(&depth, &upt);
 	return 0;
 }

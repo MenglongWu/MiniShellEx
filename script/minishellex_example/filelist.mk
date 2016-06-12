@@ -11,5 +11,5 @@
 # SRCS-y += shell/minishell_core.c
 # SRCS-y += shell/minishell_core_ex.c
 
-SRCS-y += src/router.c
-SRCS-y += src/cmd_output.c
+SRCS-y += src/switch.c
+SRCS-y += src/cmd_switch.c
