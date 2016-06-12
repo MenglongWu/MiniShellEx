@@ -4,15 +4,15 @@
 #
 # pixxx=script/default
 # pixxx_arg=[all,mlib,elf...] one of us, [all, mlib,elf...] is top path Makefile operation
-	pi1=script/minishellex_example
-		pi1_arg=elf
-	pi4=script/tool-build
+	pi2=script/minishellex_example
+		pi2_arg=elf
+	pi3=script/tool-build
+		pi3_arg=elf
+	pi4=script/test
 		pi4_arg=elf
-	pi5=script/test
-		pi5_arg=elf
 
-	pi6=script/libminishell
-		pi6_arg=mlib
+	pi1=script/libminishell
+		pi1_arg=mlib
 
 	# pi2=script/prj_liba
 	# 	pi2_arg=mlib

@@ -8,5 +8,3 @@
 
 SRCS-y = example/test_auto.c
 SRCS-y += example/cmd_output.c
-SRCS-y += shell/minishell_core.c
-SRCS-y += shell/minishell_core_ex.c
