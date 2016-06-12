@@ -1,3 +1,23 @@
+/**
+ ******************************************************************************
+ * @file	msbuild.c
+ * @brief	MiniShell-Ex auto make 
+
+MiniShell-Ex auto make struct cmd_prompt in a c file
+ *
+ @section Platform
+	-# 
+ @section Library
+	-# 
+- 2016-6-3,MenglongWu,MenglongWoo@aliyun.com
+ 	
+
+ * @attention
+ *
+ * ATTENTION
+ *
+ * <h2><center>&copy; COPYRIGHT </center></h2>
+*/
 #include "stdio.h"
 #include <string.h>
 #include <stdlib.h>
@@ -5,34 +25,71 @@
 
 #include <readline/readline.h>
 #include "build.h"
+#include <stdbool.h>
 
+char *in_xml;
+char *out_xml;
+char *out_c;
 
+void usage()
+{
+	printf("Usage\n");
+	printf("msbuild <input xml file> <output c file>\n");
+}
 
-// #include <stdbool.h>
-// extern bool isredefine_group(struct group *val , struct group *gp);
-// extern void check_redefine(struct group *val , long len);
-// extern bool isredefine_item(struct item *val, struct item *it);
+bool check_exist(char *name)
+{
+	FILE *fp;
 
-// extern void count_obj(struct group *val , long *count);
-// extern struct total_map *malloc_map_obj(struct group *val , long count);
-// extern void free_map_obj(struct total_map *map);
-// extern void check_redefine(struct line_map *lmap);
+	fp = fopen(name, "r");
+	if (fp == NULL) {
+		return false;
+	}
+	fclose(fp);
+	return true;
+}
 int main (int argc , char **argv)
 {
+	if (argc < 3) {
+		usage();
+		exit(0);
+	}
+
+
+	in_xml = argv[1];
+	out_c  = argv[2];
+	if (check_exist(in_xml) == false) {
+		printf("input file [%s] no find\n", in_xml);
+		exit(0);
+	}
+	if (check_exist(out_c) == true) {
+		printf("input file [%s] have exit, over write?[y/n] :", out_c);
+
+		char ch;
+
+		scanf("%c", &ch);
+		switch (ch | 0x20) {
+		case 'y':
+			break;
+		default:
+			exit(0);
+			break;
+		}
+
+	}
+
+
 	struct group *head;
 
-	head = xmlloadconfig("def.xml");
+	head = xmlloadconfig(in_xml);
 	if (head == NULL) {
 		printf("open file\n");
 		return 0;
 	}
 	disp_group(head);
-	// cfilesave("cmd_output.c", head);
-	// xmlsaveconfig("out.xml",head);
 
 	int count = 0;
 	count_obj(head, &count);
-	printf("count = %d\n", count);
 
 	struct total_map *map;
 	struct line_map *lmap;
@@ -41,10 +98,10 @@ int main (int argc , char **argv)
 	map = malloc_map_obj(head, count);
 	lmap = map->line;
 
-	
+
 	check_redefine(lmap);
-	cfilesave("cmd_output.c", head);
-	xmlsaveconfig("out.xml",head);
+	cfilesave(out_c, head);
+	// xmlsaveconfig(out_xml,head);
 	free_map_obj(map);
-	return 0;
+
 }

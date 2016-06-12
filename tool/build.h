@@ -8,6 +8,7 @@ struct item {
 	struct list_head  next;				///<节点链表
 	char *alias;
 	char *help;
+	char *type;
 	int flag;
 };
 

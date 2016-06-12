@@ -2,46 +2,92 @@
 
 <bookstore>
 
-<group name="root" abc="sd">
+<group name="root">
 <item name="show" boot="show" help="show something"></item>
 <item name="interface" boot="interface" help="enter interface"></item>
-<item name="ip" boot="ip" help="enter interface"></item>
-<item name="vlan" boot="vlan" help="config vlan"></item>
-<item name="hostname" boot="" help="config vlan"></item>
+<item name="vlan" boot="vlan" help="Configure VLAN"></item>
+<item name="hostname" boot="hostname" help="Config Hostname"></item>
+<item name="quit_system" boot="" alias="quit" help="Exit from current command view"></item>
 </group>
 
 
 
 <group name="show">
-<item name="run"  boot="" alias="run" help="help 2"></item>
-<item name="vlan"  boot=""  alias="vlan" help="help 3"></item>
+<item name="show_run"  boot="" alias="run" help="Current configuration "></item>
+<item name="show_vlan"  boot=""  alias="vlan" help="VLAN configuration information"></item>
+<item name="show_interface"  boot=""  alias="interface" help="Status and configuration information for the interface "></item>
+</group>
+
+<group name="hostname">
+<item name="set_hostname"  boot="" alias="name" help="Set hostname" type="pass"></item>
 </group>
 
 
 <group name="interface">
-<item name="fastethernet" boot="" help="help 2"></item>
-<item name="gethernet" boot=""  help="help 3"></item>
+<item name="fastethernet" boot="fastethernet" help="FastEthernet interface"></item>
+<item name="gigabitethernet" boot="gigabitethernet"  help="GigabitEthernet interface"></item>
 </group>
 
-
-<group name="ip">
-<item name="router"  boot="" help="help 2"></item>
-<item name="address"  boot=""  help="help 3"></item>
+<group name="fastethernet">
+<item name="" boot="" alias="[1-10]" help="ethernet port interface" type="pass"></item>
 </group>
+
+<group name="gigabitethernet">
+<item name="" boot="" alias="[11-12]" help="ethernet port interface" type="pass"></item>
+</group>
+
 
 <group name="vlan">
-<item  name="1" boot="" alias="c31"></item>
-<item name="2"  boot="" alias="c321"></item>
-<item name="3"  boot="" alias="c323"></item>
-</group>
-
-<group name="vlan">
-<item  name="2" boot="" alias="c31"></item>
+<item name="" boot="" alias="[1-1024]" help="VLAN interface" type="pass"></item>
 </group>
 
 
-<group name="root">
-<item name="3"  boot="" alias="c323"></item>
+
+<group name="interface_root" >
+<item name="arp" boot="arp" help="Configure ARP for the interface "></item>
+<item name="flow" boot="flow" help="Flow control command"></item>
+<item name="ip" boot="interface_ip" help="Specify IP configurations for the system"></item>
+<item name="quit" help="Exit from current command view"></item>
+</group>
+
+<group name="arp" >
+<item name="detection" boot="detection" help="Configure ARP for the interface"></item>
+<item name="filter" boot="filter" help="Filter ARP packets"></item>
+<item name="max_learning_num" boot="max_learning_num" alias="max-learn" help="Set the maximum number of dynamic arp entries learned on the interface"></item>
+</group>
+
+<group name="detection" >
+<item name="trust" boot="" help="Specify port trust state"></item>
+</group>
+
+<group name="filter" >
+<item name="on" boot="" help="turn on arp filter"></item>
+<item name="off" boot="" help="turn off arp filter"></item>
+</group>
+
+<group name="max_learning_num" >
+<item name="unuse" boot="" alias="INTEGER[0-256]" help="Maximum number of dynamic arp entries learned on the interface" type="pass"></item>
+</group>
+
+
+
+
+<group name="flow" >
+<item name="on" boot="" help="turn on flow"></item>
+<item name="off" boot="" help="turn off flow"></item>
+</group>
+
+
+
+
+<group name="interface_ip" >
+<item name="address" boot="ip_addr" help="IP address"></item>
+<item name="gw" boot="ip_addr" help="Gate way"></item>
+<item name="mac" boot="ip_addr" help="MAC"></item>
+</group>
+
+<group name="ip_addr" >
+<item name="unuse" boot="" alias="x.x.x.x" help="IP address" type="pass"></item>
 </group>
 
 

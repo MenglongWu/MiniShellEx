@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <linux/list.h>
 #include "build.h"
+#include <malloc.h>
+#include <string.h>
 
 //////////////////////////////////////////////////////////
 // ergodic link list
