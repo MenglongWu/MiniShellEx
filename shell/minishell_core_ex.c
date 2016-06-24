@@ -246,10 +246,11 @@ int sh_completion_head(struct cmd_prompt *pprompt, char *text,
 #endif
 	char *ps,*ps_next;
 	ps = ptprompt->name;
-	while(*ps == *text) {
+	while(*ps == *text && len) {
 #ifdef MINISHELL_DBG
 		printf("%c %c", *ps, *text);
 #endif
+		len--;
 		ps++;
 		text++;
 	}
