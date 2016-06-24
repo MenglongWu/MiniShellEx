@@ -1,0 +1,16 @@
+/*! \page Bug-0002
+没有help内容会崩溃
+PROMPT_NODE(boot_cmd1   ,      do_cmd1,
+         (char*)"cmd1"  ,
+         (char*)"",
+         (int)  NULL),
+这样就OK
+PROMPT_NODE(boot_cmd1   ,      do_cmd1,
+         (char*)"cmd1"  ,
+         (char*)"sd",
+         (int)  NULL),
+
+Fix
+
+sh_completion_head 添加长度检测
+*/
