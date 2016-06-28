@@ -36,7 +36,7 @@ static int _cfilesave_def_boot_x(struct group *val, void *ptr)
 		return 0;
 	}
 	FILE *fp = (FILE *)ptr;
-	fprintf(fp, "struct cmd_prompt boot_%s[];\n", val->name);
+	fprintf(fp, "extern struct cmd_prompt boot_%s[];\n", val->name);
 	return 0;
 }
 static int _cfilesave_item(struct item *val, void *ptr)

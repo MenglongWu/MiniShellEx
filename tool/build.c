@@ -88,7 +88,7 @@ int main (int argc , char **argv)
 	}
 	disp_group(head);
 
-	int count = 0;
+	long count = 0;
 	count_obj(head, &count);
 
 	struct total_map *map;

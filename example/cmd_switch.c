@@ -34,21 +34,21 @@ static int do_mac(void *ptr, int argc, char **argv);
 
 
 
-struct cmd_prompt boot_root[];
-struct cmd_prompt boot_show[];
-struct cmd_prompt boot_hostname[];
-struct cmd_prompt boot_interface[];
-struct cmd_prompt boot_fastethernet[];
-struct cmd_prompt boot_gigabitethernet[];
-struct cmd_prompt boot_vlan[];
-struct cmd_prompt boot_interface_root[];
-struct cmd_prompt boot_arp[];
-struct cmd_prompt boot_detection[];
-struct cmd_prompt boot_filter[];
-struct cmd_prompt boot_max_learning_num[];
-struct cmd_prompt boot_flow[];
-struct cmd_prompt boot_interface_ip[];
-struct cmd_prompt boot_ip_addr[];
+extern struct cmd_prompt boot_root[];
+extern struct cmd_prompt boot_show[];
+extern struct cmd_prompt boot_hostname[];
+extern struct cmd_prompt boot_interface[];
+extern struct cmd_prompt boot_fastethernet[];
+extern struct cmd_prompt boot_gigabitethernet[];
+extern struct cmd_prompt boot_vlan[];
+extern struct cmd_prompt boot_interface_root[];
+extern struct cmd_prompt boot_arp[];
+extern struct cmd_prompt boot_detection[];
+extern struct cmd_prompt boot_filter[];
+extern struct cmd_prompt boot_max_learning_num[];
+extern struct cmd_prompt boot_flow[];
+extern struct cmd_prompt boot_interface_ip[];
+extern struct cmd_prompt boot_ip_addr[];
 
 
 

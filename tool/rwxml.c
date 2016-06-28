@@ -204,14 +204,14 @@ static int _xmlwrite_group(struct group *val, void *ptr)
 	xmlNodePtr proot = (xmlNodePtr)ptr;
 	xmlNodePtr child_node;
 
-	xmlNsPtr group_node = xmlNewNode(NULL, BAD_CAST "group");
-	xmlNewProp(group_node, BAD_CAST "name", BAD_CAST val->name);
-	xmlAddChild(proot, group_node);
+	xmlNsPtr group_node = (xmlNsPtr)xmlNewNode(NULL, BAD_CAST "group");
+	xmlNewProp((xmlNodePtr)group_node, BAD_CAST "name", BAD_CAST val->name);
+	xmlAddChild(proot, (xmlNodePtr)group_node);
 
 	if (val->item_first) {
 		xmlwrite_item(group_node, val->item_first);
 	}
-	xmlAddChild(proot, group_node);
+	xmlAddChild(proot, (xmlNodePtr)group_node);
 	return 0;
 }
 static void xmlwrite_group(xmlNodePtr proot, struct group *val)

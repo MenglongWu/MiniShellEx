@@ -118,11 +118,11 @@ extern void sh_whereboot(struct cmd_prompt *boot_new);
 #endif
 #define PROMPT_NODE(a,f,b,c,d) \
 { \
-	.next = (struct cmd_prompt	*)(a), \
-	.fun  = (int (*)(void *, int , char **))f, \
-	.name = (char*)(b), \
-	.help = (char*)(c), \
-	.type = (int)(d), \
+	/*.next = */ (struct cmd_prompt	*)(a), \
+	/*.fun  = */ (int (*)(void *, int , char **))f, \
+	/*.name = */ (char*)(b), \
+	/*.help = */ (char*)(c), \
+	/*.type = */ (int)(d), \
 }
 
 

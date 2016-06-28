@@ -189,8 +189,8 @@ void check_redefine(struct line_map *lmap)
 
 				break;
 			case MST_ITEM:
-				iit = ilmap->addr;
-				jit = jlmap->addr;
+				iit = (struct item *)ilmap->addr;
+				jit = (struct item *)jlmap->addr;
 				// printf("	item %s %s\n", iit->name, jit->name);
 				if ( strcmp(iit->name, jit->name) == 0) {
 					// printf("	item redefine %s\n", iit->name);
